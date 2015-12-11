@@ -4,10 +4,20 @@
   <groupId>com.jtool</groupId>
   <artifactId>jtool-apiclient</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>jtool-apiclient</name>
-  <url>http://maven.apache.org</url>
+  <version>0.0.1</version>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.12</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -26,11 +36,14 @@
       <version>2.4</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.12</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
+
+  <distributionManagement>
+    <repository>
+      <id>jtool-maven-repository</id>
+      <name>Internal Repository</name>
+      <url>file://${project.basedir}/../jtool-mvn-repository/releases</url>
+    </repository>
+  </distributionManagement>
+
 </project>
