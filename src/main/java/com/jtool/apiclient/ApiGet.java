@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-public class ApiGet {
+class ApiGet {
 
     private static Logger logger = LoggerFactory.getLogger(ApiGet.class);
 

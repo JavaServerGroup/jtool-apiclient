@@ -26,6 +26,20 @@ public class ApiGetTest {
     }
 
     @Test
+    public void getURLEncoderTest() throws Exception {
+        People people = new People();
+        people.setName("1+1");
+
+        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sentByBean("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
+        Assert.assertEquals("1+1", responsePeople.getName());
+        Assert.assertNull(responsePeople.getAge());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
     public void getTest2() throws Exception {
         People people = new People();
         people.setName("中文名");

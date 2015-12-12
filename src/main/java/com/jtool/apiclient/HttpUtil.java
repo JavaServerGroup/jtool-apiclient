@@ -8,6 +8,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +52,11 @@ class HttpUtil {
                     if (!"".equals(paramsString)) {
                         paramsString += "&";
                     }
-                    paramsString += paramName + "=" + params.get(paramName).toString();
+                    try {
+                        paramsString += URLEncoder.encode(paramName, "UTF-8") + "=" + URLEncoder.encode(params.get(paramName).toString(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

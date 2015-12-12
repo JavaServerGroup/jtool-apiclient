@@ -51,6 +51,20 @@ public class ApiPostTest {
     }
 
     @Test
+    public void postWithUrlAndBeanParamTestWithURLEncode() throws Exception {
+        People people = new People();
+        people.setName("1+1");
+
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
+        Assert.assertEquals("1+1", responsePeople.getName());
+        Assert.assertNull(responsePeople.getAge());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
     public void postWithUrlAndBeanWithFileParamTest() throws Exception {
 
         People people = new People();

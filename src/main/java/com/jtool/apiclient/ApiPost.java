@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
-public class ApiPost {
+class ApiPost {
 
     private static Logger logger = LoggerFactory.getLogger(ApiPost.class);
 
