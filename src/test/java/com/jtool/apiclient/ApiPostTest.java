@@ -82,6 +82,23 @@ public class ApiPostTest {
     }
 
     @Test
+    public void mypostWithUrlAndBeanWithFileParamTest() throws Exception {
+
+        People people = new People();
+//        people.setAge(30);
+//        people.setHeight(1.73);
+        people.setAvatar(new File(ApiPostTest.class.getResource("/media/g.gif").getFile()));
+
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
+//        Assert.assertEquals("中文名", responsePeople.getName());
+//        Assert.assertEquals(new Integer(30), responsePeople.getAge());
+//        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getArticle());
+    }
+
+    @Test
     public void postWithUrlAndBeanWithTwoFileParamTest() throws Exception {
 
         People people = new People();

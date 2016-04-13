@@ -4,7 +4,7 @@
   <groupId>com.jtool</groupId>
   <artifactId>jtool-apiclient</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -16,6 +16,11 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.12</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jtool</groupId>
+      <artifactId>jtool-support</artifactId>
+      <version>0.0.1</version>
     </dependency>
 
     <dependency>

@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.jtool.support.log.LogBuilder.buildLog;
+
 class ApiPost {
 
     private static Logger logger = LoggerFactory.getLogger(ApiPost.class);
@@ -69,7 +71,7 @@ class ApiPost {
             } else if(300 < responseCode && responseCode < 400) {
                 return sent(httpURLConnection.getHeaderField("Location"));
             } else {
-                logger.debug("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr);
+                logger.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr));
                 throw new StatusCodeNot200Exception(urlStr, params, responseCode);
             }
         } catch (IOException e) {
@@ -77,7 +79,7 @@ class ApiPost {
                 if(httpURLConnection != null) {
                     result = HttpUtil.readAndCloseStream(httpURLConnection.getErrorStream());
                 }
-                logger.debug("访问发生IO错误，错误流信息为：" + result);
+                logger.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
             } catch(IOException ex) {
                 e.printStackTrace();
             }
@@ -190,7 +192,7 @@ class ApiPost {
             } else if(300 < responseCode && responseCode < 400) {
                 return sent(httpURLConnection.getHeaderField("Location"));
             } else {
-                logger.debug("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + url);
+                logger.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + url));
                 throw new StatusCodeNot200Exception(url, params, responseCode);
             }
         } catch (IOException e) {
@@ -198,7 +200,7 @@ class ApiPost {
                 if(httpURLConnection != null) {
                     result = HttpUtil.readAndCloseStream(httpURLConnection.getErrorStream());
                 }
-                logger.debug("访问发生IO错误，错误流信息为：" + result);
+                logger.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
             } catch(IOException ex) {
                 e.printStackTrace();
             }

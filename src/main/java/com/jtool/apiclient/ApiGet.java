@@ -9,6 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import static com.jtool.support.log.LogBuilder.buildLog;
+
 class ApiGet {
 
     private static Logger logger = LoggerFactory.getLogger(ApiGet.class);
@@ -40,7 +42,7 @@ class ApiGet {
             } else if(300 < responseCode && responseCode < 400) {
                 return sent(httpURLConnection.getHeaderField("Location"));
             } else {
-                logger.debug("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr);
+                logger.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr));
                 throw new StatusCodeNot200Exception(urlStr, responseCode);
             }
         } catch (IOException e) {
@@ -48,7 +50,7 @@ class ApiGet {
                 if(httpURLConnection != null) {
                     result = HttpUtil.readAndCloseStream(httpURLConnection.getErrorStream());
                 }
-                logger.debug("访问发生IO错误，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + result);
+                logger.debug(buildLog("访问发生IO错误，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + result));
             } catch(IOException ex) {
                 e.printStackTrace();
             }

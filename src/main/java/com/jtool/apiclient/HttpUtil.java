@@ -12,6 +12,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.jtool.support.log.LogBuilder.buildLog;
+
 class HttpUtil {
 
     private static Logger logger = LoggerFactory.getLogger(HttpUtil.class);
@@ -88,7 +90,7 @@ class HttpUtil {
                 }
             }
         } catch (Exception e) {
-            logger.debug("将bean转化为map时发生错误：" + obj);
+            logger.debug(buildLog("将bean转化为map时发生错误：" + obj));
         }
 
         return map;
