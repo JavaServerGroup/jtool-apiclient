@@ -30,7 +30,7 @@ public class ApiGetTest {
         People people = new People();
         people.setName("1+1");
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sentByBean("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
         Assert.assertEquals("1+1", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -46,7 +46,7 @@ public class ApiGetTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sentByBean("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -70,7 +70,7 @@ public class ApiGetTest {
         params.put("age", 31);
         params.put("height", 1.74);
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sentByMap("http://chat.palm-chat.cn/TestServer/sentGet", params), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", params), ResponsePeople.class);
         Assert.assertEquals("map中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(31), responsePeople.getAge());
         Assert.assertEquals(new Double(1.74), responsePeople.getHeight());

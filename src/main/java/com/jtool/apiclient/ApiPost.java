@@ -14,23 +14,45 @@ import static com.jtool.support.log.LogBuilder.buildLog;
 
 class ApiPost {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiPost.class);
+    private static Logger log = LoggerFactory.getLogger(ApiPost.class);
 
     public static String sent(String urlStr) throws IOException {
-        return sentByMap(urlStr, null);
+        return process(urlStr, null, true);
     }
 
-    public static String sentByBean(String urlStr,Object bean) throws IOException {
-        return sentByMap(urlStr, HttpUtil.bean2Map(bean));
+    public static String sent(String urlStr, boolean needLog) throws IOException {
+        return process(urlStr, null, needLog);
     }
 
-    public static String sentByMap(String urlStr, Map<String, Object> params) throws IOException {
+    public static String sent(String urlStr, Object param) throws IOException {
+        return sent(urlStr, param, true);
+    }
+
+    public static String sent(String urlStr, Object param, boolean needLog) throws IOException {
+        if(param == null) {
+            return sent(urlStr);
+        }
+
+        if (param instanceof Map) {
+            return process(urlStr, (Map) param, needLog);
+        } else {
+            return process(urlStr, HttpUtil.bean2Map(param), needLog);
+        }
+    }
+
+    private static String process(String urlStr, Map<String, Object> params, boolean needLog) throws IOException {
+
+        if(needLog) {
+            params = HttpUtil.addLogSeed(params);
+        }
 
         if(isPostFile(params)) {
             return sentFile(urlStr, params);
         }
 
         String paramsString = HttpUtil.params2paramsStr(params);
+
+        log.debug(buildLog("发送请求: curl " + urlStr + " -X POST -d '" + paramsString + "'"));
 
         HttpURLConnection httpURLConnection = null;
         InputStream is;
@@ -71,7 +93,7 @@ class ApiPost {
             } else if(300 < responseCode && responseCode < 400) {
                 return sent(httpURLConnection.getHeaderField("Location"));
             } else {
-                logger.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr));
+                log.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + urlStr));
                 throw new StatusCodeNot200Exception(urlStr, params, responseCode);
             }
         } catch (IOException e) {
@@ -79,7 +101,7 @@ class ApiPost {
                 if(httpURLConnection != null) {
                     result = HttpUtil.readAndCloseStream(httpURLConnection.getErrorStream());
                 }
-                logger.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
+                log.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
             } catch(IOException ex) {
                 e.printStackTrace();
             }
@@ -90,6 +112,8 @@ class ApiPost {
                 httpURLConnection.disconnect();
             }
         }
+
+        log.debug(buildLog("请求返回: " + result));
 
         return result;
     }
@@ -192,7 +216,7 @@ class ApiPost {
             } else if(300 < responseCode && responseCode < 400) {
                 return sent(httpURLConnection.getHeaderField("Location"));
             } else {
-                logger.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + url));
+                log.debug(buildLog("访问请求返回的不是200码:" + responseCode + "\t" + "url:" + url));
                 throw new StatusCodeNot200Exception(url, params, responseCode);
             }
         } catch (IOException e) {
@@ -200,7 +224,7 @@ class ApiPost {
                 if(httpURLConnection != null) {
                     result = HttpUtil.readAndCloseStream(httpURLConnection.getErrorStream());
                 }
-                logger.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
+                log.debug(buildLog("访问发生IO错误，错误流信息为：" + result));
             } catch(IOException ex) {
                 e.printStackTrace();
             }
@@ -219,6 +243,8 @@ class ApiPost {
                 httpURLConnection.disconnect();
             }
         }
+
+        log.debug(buildLog("请求返回: " + result));
 
         return result;
     }

@@ -1,5 +1,7 @@
 package com.jtool.apiclient;
 
+import com.jtool.support.log.LogPojo;
+import com.jtool.support.log.LogThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +95,15 @@ class HttpUtil {
             logger.debug(buildLog("将bean转化为map时发生错误：" + obj));
         }
 
+        return map;
+    }
+
+    //为了日志可往后跟踪，增加一个请求参数
+    public static Map<String, Object> addLogSeed(Map<String, Object> map) {
+        LogPojo logPojo = LogThreadLocal.get();
+        if(logPojo != null) {
+            map.put(LogPojo.logKey, logPojo.getLogId());
+        }
         return map;
     }
 

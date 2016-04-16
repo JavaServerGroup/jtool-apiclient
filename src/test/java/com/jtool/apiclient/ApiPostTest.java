@@ -41,7 +41,7 @@ public class ApiPostTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -55,7 +55,7 @@ public class ApiPostTest {
         People people = new People();
         people.setName("1+1");
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
         Assert.assertEquals("1+1", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -72,7 +72,7 @@ public class ApiPostTest {
         people.setHeight(1.73);
         people.setAvatar(new File(ApiPostTest.class.getResource("/media/g.gif").getFile()));
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -89,7 +89,7 @@ public class ApiPostTest {
 //        people.setHeight(1.73);
         people.setAvatar(new File(ApiPostTest.class.getResource("/media/g.gif").getFile()));
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
 //        Assert.assertEquals("中文名", responsePeople.getName());
 //        Assert.assertEquals(new Integer(30), responsePeople.getAge());
 //        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -107,7 +107,7 @@ public class ApiPostTest {
         people.setAvatar(new File(ApiPostTest.class.getResource("/media/g.gif").getFile()));
         people.setGallery(new File(ApiPostTest.class.getResource("/media/j.jpg").getFile()));
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost?name=中文名", people), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -127,7 +127,7 @@ public class ApiPostTest {
         people.setGallery(new File(ApiPostTest.class.getResource("/media/j.jpg").getFile()));
         people.setArticle(new File(ApiPostTest.class.getResource("/media/myarticle.txt").getFile()));
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sentByBean("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(ApiPost.sent("http://chat.palm-chat.cn/TestServer/sentPost", people), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -157,7 +157,7 @@ public class ApiPostTest {
         people.setHeight(1.73);
         people.setAvatar(new File(ApiPostTest.class.getResource("/media/g.gif").getFile()));
 
-        ApiPost.sentByBean("http://xxx.abc", people);
+        ApiPost.sent("http://xxx.abc", people);
     }
 
     @Test(expected= IOException.class)
