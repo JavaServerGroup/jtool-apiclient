@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApiGetTest {
+
+    ApiGet ApiGet = new ApiGet();
+
     @Test
     public void getTest() throws Exception {
         Assert.assertEquals("{}", ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet"));

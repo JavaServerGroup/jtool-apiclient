@@ -18,6 +18,8 @@ public class ApiPostTest {
 
     private static Logger logger = LoggerFactory.getLogger(ApiPostTest.class);
 
+    ApiPost ApiPost = new ApiPost();
+
     @Test
     public void postWithNoParamTest() throws Exception {
         //发送没参数的post请求

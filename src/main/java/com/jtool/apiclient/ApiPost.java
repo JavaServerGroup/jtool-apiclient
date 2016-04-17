@@ -12,35 +12,12 @@ import java.util.UUID;
 
 import static com.jtool.support.log.LogBuilder.buildLog;
 
-class ApiPost {
+public class ApiPost extends AbstractApi {
 
-    private static Logger log = LoggerFactory.getLogger(ApiPost.class);
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public static String sent(String urlStr) throws IOException {
-        return process(urlStr, null, true);
-    }
-
-    public static String sent(String urlStr, boolean needLog) throws IOException {
-        return process(urlStr, null, needLog);
-    }
-
-    public static String sent(String urlStr, Object param) throws IOException {
-        return sent(urlStr, param, true);
-    }
-
-    public static String sent(String urlStr, Object param, boolean needLog) throws IOException {
-        if(param == null) {
-            return sent(urlStr);
-        }
-
-        if (param instanceof Map) {
-            return process(urlStr, (Map) param, needLog);
-        } else {
-            return process(urlStr, HttpUtil.bean2Map(param), needLog);
-        }
-    }
-
-    private static String process(String urlStr, Map<String, Object> params, boolean needLog) throws IOException {
+    @Override
+    protected String process(String urlStr, Map<String, Object> params, boolean needLog) throws IOException {
 
         if(needLog) {
             params = HttpUtil.addLogSeed(params);
@@ -131,7 +108,7 @@ class ApiPost {
         return false;
     }
 
-    private static String sentFile(String url, Map<String, Object> params) throws IOException {
+    private String sentFile(String url, Map<String, Object> params) throws IOException {
 
         String BOUNDARY = UUID.randomUUID().toString();
         String PREFIX = "--";
