@@ -36,14 +36,14 @@ Api().get("http://www.example.org");
 or
 Api().post("http://www.example.org");
 ```
-#方法介绍
-header方法。当发送的请求需要带上header:
+##方法介绍
+###header方法。当发送的请求需要带上header:
 ```java
 Map<String, String> header = new HashMap<String, String>();
 header.put("Authorization", "Basic xxx");
 Api().header(header).post("http://www.example.org");
 ```
-param()方法。当请求需要单上参数:   
+###param方法。当请求需要单上参数:   
 带pojo参数：
 ```java
 public class User{
