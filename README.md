@@ -78,3 +78,5 @@ _logId参数来自于ThreadLocal,当需要别的线程发送又希望请求带�
 ```java
 Api().logId("a_random_logId").get("http://www.example.org");
 ```
+#异常：StatusCodeNot200Exception
+当请求返回的status code返回的码不在大于等于200，小于400的时候，会抛出一个自定义的运行时异常:StatusCodeNot200Exception
