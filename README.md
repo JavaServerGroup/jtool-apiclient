@@ -17,6 +17,7 @@
         </snapshots>
     </repository>
 </repositories>
+```
 2.添加依赖
 ```xml
 <dependency>
@@ -24,7 +25,6 @@
     <artifactId>jtool-apiclient</artifactId>
     <version>0.0.4</version>
 </dependency>
-```
 ```
 2.添加import
 ```xml
