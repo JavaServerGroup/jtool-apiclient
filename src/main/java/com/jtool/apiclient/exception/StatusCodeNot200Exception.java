@@ -25,7 +25,7 @@ public class StatusCodeNot200Exception extends RuntimeException {
 		this.url = url;
 		this.params = params;
 		this.statusCode = statusCode;
-		logger.debug(statusCode + "");
+		logger.error(this.getStatusCode() + "\t" + this.getUrl() + "\t" + this.getParams().toString(), this);
 	}
 
 	public String getUrl() {

@@ -1,9 +1,9 @@
-package com.jtool.apiclient;
+package com.jtool.apiclient.demo;
 
 import com.alibaba.fastjson.JSON;
+import com.jtool.apiclient.demo.model.People;
+import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
-import com.jtool.apiclient.model.People;
-import com.jtool.apiclient.model.ResponsePeople;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,15 +11,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApiGetTest {
+import static com.jtool.apiclient.ApiClient.Api;
 
-    ApiGet ApiGet = new ApiGet();
+public class ApiGetTest {
 
     @Test
     public void getTest() throws Exception {
-        Assert.assertEquals("{}", ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet"));
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet?name=中文名"), ResponsePeople.class);
+        Assert.assertEquals("{}", Api().get("http://chat.palm-chat.cn/TestServer/sentGet"));
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().get("http://chat.palm-chat.cn/TestServer/sentGet?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -33,7 +34,7 @@ public class ApiGetTest {
         People people = new People();
         people.setName("1+1");
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).get("http://chat.palm-chat.cn/TestServer/sentGet"), ResponsePeople.class);
         Assert.assertEquals("1+1", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -49,7 +50,7 @@ public class ApiGetTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", people), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).get("http://chat.palm-chat.cn/TestServer/sentGet"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -60,7 +61,7 @@ public class ApiGetTest {
 
     @Test
     public void getTest3() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet?name=中文&age=22&height=1.66"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().get("http://chat.palm-chat.cn/TestServer/sentGet?name=中文&age=22&height=1.66"), ResponsePeople.class);
         Assert.assertEquals("中文", responsePeople.getName());
         Assert.assertEquals(new Integer(22), responsePeople.getAge());
         Assert.assertEquals(new Double(1.66), responsePeople.getHeight());
@@ -73,7 +74,7 @@ public class ApiGetTest {
         params.put("age", 31);
         params.put("height", 1.74);
 
-        ResponsePeople responsePeople = JSON.parseObject(ApiGet.sent("http://chat.palm-chat.cn/TestServer/sentGet", params), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).get("http://chat.palm-chat.cn/TestServer/sentGet"), ResponsePeople.class);
         Assert.assertEquals("map中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(31), responsePeople.getAge());
         Assert.assertEquals(new Double(1.74), responsePeople.getHeight());
@@ -81,11 +82,11 @@ public class ApiGetTest {
 
     @Test(expected= StatusCodeNot200Exception.class)
     public void get404() throws Exception {
-        ApiGet.sent("http://chat.palm-chat.cn/TestServer/404");
+        Api().get("http://chat.palm-chat.cn/TestServer/404");
     }
 
     @Test(expected= IOException.class)
     public void postIoException() throws Exception {
-        ApiGet.sent("http://xxx.abc");
+        Api().get("http://xxx.abc");
     }
 }

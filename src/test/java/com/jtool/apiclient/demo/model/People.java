@@ -1,12 +1,16 @@
-package com.jtool.apiclient.model;
+package com.jtool.apiclient.demo.model;
 
-public class ResponsePeople {
+import java.io.File;
+
+public class People {
+
     private String name;
     private Integer age;
     private Double height;
-    private String avatar;
-    private String gallery;
-    private String article;
+    private File avatar;
+    private File gallery;
+    private File article;
+
     public String getName() {
         return name;
     }
@@ -31,39 +35,39 @@ public class ResponsePeople {
         this.height = height;
     }
 
-    public String getAvatar() {
+    public File getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(File avatar) {
         this.avatar = avatar;
     }
 
-    public String getGallery() {
+    public File getGallery() {
         return gallery;
     }
 
-    public void setGallery(String gallery) {
+    public void setGallery(File gallery) {
         this.gallery = gallery;
     }
 
-    public String getArticle() {
+    public File getArticle() {
         return article;
     }
 
-    public void setArticle(String article) {
+    public void setArticle(File article) {
         this.article = article;
     }
 
     @Override
     public String toString() {
-        return "ResponsePeople{" +
+        return "People{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
                 ", height=" + height +
-                ", avatar='" + avatar + '\'' +
-                ", gallery='" + gallery + '\'' +
-                ", article='" + article + '\'' +
+                ", avatar=" + avatar +
+                ", gallery=" + gallery +
+                ", article=" + article +
                 '}';
     }
 }

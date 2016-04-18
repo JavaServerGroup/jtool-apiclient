@@ -1,7 +1,5 @@
 package com.jtool.apiclient;
 
-import com.jtool.support.log.LogPojo;
-import com.jtool.support.log.LogThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +8,16 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.jtool.support.log.LogBuilder.buildLog;
 
-class HttpUtil {
+class Util {
 
-    private static Logger logger = LoggerFactory.getLogger(HttpUtil.class);
+    private static Logger log = LoggerFactory.getLogger(Util.class);
 
     static String readAndCloseStream(InputStream is) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
@@ -92,19 +91,53 @@ class HttpUtil {
                 }
             }
         } catch (Exception e) {
-            logger.debug(buildLog("将bean转化为map时发生错误：" + obj));
+            log.debug(buildLog("将bean转化为map时发生错误：" + obj));
         }
 
         return map;
     }
 
-    //为了日志可往后跟踪，增加一个请求参数
-    public static Map<String, Object> addLogSeed(Map<String, Object> map) {
-        LogPojo logPojo = LogThreadLocal.get();
-        if(logPojo != null) {
-            map.put(LogPojo.logKey, logPojo.getLogId());
+    static void addHeaderToHttpURLConnection(Map<String, String> header, HttpURLConnection httpURLConnection) {
+        if(header != null) {
+            for (String key : header.keySet()) {
+                httpURLConnection.setRequestProperty(key, header.get(key));
+            }
         }
-        return map;
+    }
+
+    static boolean isPostFile(Map<String, Object> params) {
+        if(params == null) {
+            return false;
+        }
+        for (String key : params.keySet()) {
+            Object param = params.get(key);
+            if (param instanceof File) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static String makeHeaderLogString(Map<String, String> header) {
+        String headerStr = "";
+        if(header != null) {
+            for(String headerKey : header.keySet()) {
+                headerStr += " -H '" + headerKey + ": " + header.get(headerKey) + "' ";
+            }
+        }
+        return headerStr;
+    }
+
+    static void logHttpURLConnectionErrorStream(HttpURLConnection httpURLConnection) {
+        try {
+            if(httpURLConnection != null) {
+                String errorStream = Util.readAndCloseStream(httpURLConnection.getErrorStream());
+                log.error(buildLog("访问发生异常，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + errorStream));
+            }
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
 
 }
