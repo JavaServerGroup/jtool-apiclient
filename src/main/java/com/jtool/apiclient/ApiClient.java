@@ -123,216 +123,94 @@ public class ApiClient {
             return url;
         }
 
-        private static String processGet(Request request) throws IOException {
 
-            String urlStr = request.getUrl();
-            Map<String, String> header = request.getHeader();
-            Map<String, Object> params = request.getParam();
+    }
 
-            String paramsString = Util.params2paramsStr(params);
+    private static String processGet(Request request) throws IOException {
+
+        String urlStr = request.getUrl();
+        Map<String, String> header = request.getHeader();
+        Map<String, Object> params = request.getParam();
+
+        String paramsString = Util.params2paramsStr(params);
+
+        if(!"".equals(paramsString)) {
+            urlStr += "?" + paramsString;
+        }
+
+        log.debug(buildLog("发送请求: curl " + makeHeaderLogString(header) +  " '" + urlStr + "'"));
+
+        HttpURLConnection httpURLConnection = null;
+        String result = null;
+
+        try {
+            URL mURL = new URL(urlStr);
+            httpURLConnection = (HttpURLConnection) mURL.openConnection();
+            httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            addHeaderToHttpURLConnection(header, httpURLConnection);
+
+            try {
+                int responseCode = httpURLConnection.getResponseCode();
+                if (responseCode == 200) {
+                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+                } else if (300 < responseCode && responseCode < 400) {
+                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
+                } else {
+                    logHttpURLConnectionErrorStream(httpURLConnection);
+                    throw new StatusCodeNot200Exception(urlStr, params, responseCode);
+                }
+            } catch (RedirectException re) {
+                return request.get(re.getUrl());
+            }
+        } catch (IOException e) {
+            logHttpURLConnectionErrorStream(httpURLConnection);
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
+        }
+
+        log.debug(buildLog("请求返回: " + result));
+
+        return result;
+    }
+
+    private static String processPost(Request request) throws IOException {
+
+        String urlStr = request.getUrl();
+        Map<String, String> header = request.getHeader();
+        Map<String, Object> params = request.getParam();
+
+        String paramsString = Util.params2paramsStr(params);
+
+        log.debug(buildLog("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header) + " -X POST -d '" + paramsString + "'"));
+
+        if(isPostFile(params)) {
+            return sentFile(request);
+        }
+
+        HttpURLConnection httpURLConnection = null;
+        String result = null;
+
+        try {
+            URL mURL = new URL(urlStr);
+            httpURLConnection = (HttpURLConnection) mURL.openConnection();
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setDoOutput(true);
+
+            addHeaderToHttpURLConnection(header, httpURLConnection);
 
             if(!"".equals(paramsString)) {
-                urlStr += "?" + paramsString;
-            }
-
-            log.debug(buildLog("发送请求: curl " + makeHeaderLogString(header) +  " '" + urlStr + "'"));
-
-            HttpURLConnection httpURLConnection = null;
-            String result = null;
-
-            try {
-                URL mURL = new URL(urlStr);
-                httpURLConnection = (HttpURLConnection) mURL.openConnection();
-                httpURLConnection.setRequestProperty("Charset", "UTF-8");
-                addHeaderToHttpURLConnection(header, httpURLConnection);
-
-                try {
-                    int responseCode = httpURLConnection.getResponseCode();
-                    if (responseCode == 200) {
-                        result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                    } else if (300 < responseCode && responseCode < 400) {
-                        throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                    } else {
-                        logHttpURLConnectionErrorStream(httpURLConnection);
-                        throw new StatusCodeNot200Exception(urlStr, params, responseCode);
-                    }
-                } catch (RedirectException re) {
-                    return request.get(re.getUrl());
-                }
-            } catch (IOException e) {
-                logHttpURLConnectionErrorStream(httpURLConnection);
-                e.printStackTrace();
-                throw e;
-            } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-            }
-
-            log.debug(buildLog("请求返回: " + result));
-
-            return result;
-        }
-
-        private static String processPost(Request request) throws IOException {
-
-            String urlStr = request.getUrl();
-            Map<String, String> header = request.getHeader();
-            Map<String, Object> params = request.getParam();
-
-            String paramsString = Util.params2paramsStr(params);
-
-            log.debug(buildLog("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header) + " -X POST -d '" + paramsString + "'"));
-
-            if(isPostFile(params)) {
-                return sentFile(request);
-            }
-
-            HttpURLConnection httpURLConnection = null;
-            String result = null;
-
-            try {
-                URL mURL = new URL(urlStr);
-                httpURLConnection = (HttpURLConnection) mURL.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-
-                addHeaderToHttpURLConnection(header, httpURLConnection);
-
-                if(!"".equals(paramsString)) {
-                    httpURLConnection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-                    byte[] data = paramsString.getBytes("UTF-8");
-                    httpURLConnection.setFixedLengthStreamingMode(data.length);
-
-                    OutputStream out = null;
-                    try {
-                        out = new BufferedOutputStream(httpURLConnection.getOutputStream());
-                        out.write(data);
-                        out.flush();
-                    } finally {
-                        if(out != null) {
-                            try {
-                                out.close();
-                            } catch (IOException e) {
-                                out = null;
-                            }
-                        }
-                    }
-                } else {
-                    httpURLConnection.setFixedLengthStreamingMode(0);
-                }
-
-                try {
-                    int responseCode = httpURLConnection.getResponseCode();
-                    if (responseCode == 200) {
-                        result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                    } else if (300 < responseCode && responseCode < 400) {
-                        throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                    } else {
-                        logHttpURLConnectionErrorStream(httpURLConnection);
-                        throw new StatusCodeNot200Exception(urlStr, params, responseCode);
-                    }
-                } catch (RedirectException re) {
-                    return request.post(re.getUrl());
-                }
-            } catch (IOException e) {
-                logHttpURLConnectionErrorStream(httpURLConnection);
-                e.printStackTrace();
-                throw e;
-            } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-            }
-
-            log.debug(buildLog("请求返回: " + result));
-
-            return result;
-        }
-
-        private static String sentFile(Request request) throws IOException {
-
-            String url = request.getUrl();
-            Map<String, String> header = request.getHeader();
-            Map<String, Object> params = request.getParam();
-
-            String BOUNDARY = UUID.randomUUID().toString();
-            String PREFIX = "--";
-            String LINE_END = "\r\n";
-            String MULTIPART_FROM_DATA = "multipart/form-data";
-            String CHARSET = "UTF-8";
-
-            HttpURLConnection httpURLConnection = null;
-            String result = null;
-
-            try {
-                URL uri = new URL(url);
-
-                httpURLConnection = (HttpURLConnection) uri.openConnection();
-                httpURLConnection.setReadTimeout(5000);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setUseCaches(false);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setRequestProperty("Charset", CHARSET);
-                httpURLConnection.setRequestProperty("Content-Type", MULTIPART_FROM_DATA + ";boundary=" + BOUNDARY);
-
-                addHeaderToHttpURLConnection(header, httpURLConnection);
+                httpURLConnection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+                byte[] data = paramsString.getBytes("UTF-8");
+                httpURLConnection.setFixedLengthStreamingMode(data.length);
 
                 OutputStream out = null;
                 try {
                     out = new BufferedOutputStream(httpURLConnection.getOutputStream());
-
-                    for (String key : params.keySet()) {
-                        Object param = params.get(key);
-                        if (param != null) {
-                            if (param instanceof File) {
-                                File file = (File) param;
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.append(PREFIX);
-                                stringBuilder.append(BOUNDARY);
-                                stringBuilder.append(LINE_END);
-                                stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END);
-                                stringBuilder.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END);
-                                stringBuilder.append(LINE_END);
-
-                                out.write(stringBuilder.toString().getBytes("UTF-8"));
-                                FileInputStream fileInputStream = null;
-
-                                try {
-                                    fileInputStream = new FileInputStream(file);
-                                    byte[] buffer = new byte[1024];
-                                    int len = 0;
-                                    while ((len = fileInputStream.read(buffer)) != -1) {
-                                        out.write(buffer, 0, len);
-                                    }
-                                } finally {
-                                    if (fileInputStream != null) {
-                                        try {
-                                            fileInputStream.close();
-                                        } catch (IOException e) {
-                                            fileInputStream = null;
-                                        }
-                                    }
-                                }
-                                out.write(LINE_END.getBytes("UTF-8"));
-                            } else {
-                                String paramStr = param.toString();
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.append(PREFIX);
-                                stringBuilder.append(BOUNDARY);
-                                stringBuilder.append(LINE_END);
-                                stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"" + LINE_END);
-                                stringBuilder.append("Content-Type: text/plain; charset=" + CHARSET + LINE_END);
-                                stringBuilder.append(LINE_END);
-                                stringBuilder.append(paramStr);
-                                stringBuilder.append(LINE_END);
-
-                                out.write(stringBuilder.toString().getBytes("UTF-8"));
-                            }
-                        }
-                    }
-
-                    out.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes());
+                    out.write(data);
                     out.flush();
                 } finally {
                     if(out != null) {
@@ -343,33 +221,157 @@ public class ApiClient {
                         }
                     }
                 }
+            } else {
+                httpURLConnection.setFixedLengthStreamingMode(0);
+            }
 
-                try {
-                    int responseCode = httpURLConnection.getResponseCode();
-                    if (responseCode == 200) {
-                        result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                    } else if (300 < responseCode && responseCode < 400) {
-                        throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                    } else {
-                        logHttpURLConnectionErrorStream(httpURLConnection);
-                        throw new StatusCodeNot200Exception(url, params, responseCode);
-                    }
-                } catch (RedirectException re) {
-                    return request.post(re.getUrl());
+            try {
+                int responseCode = httpURLConnection.getResponseCode();
+                if (responseCode == 200) {
+                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+                } else if (300 < responseCode && responseCode < 400) {
+                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
+                } else {
+                    logHttpURLConnectionErrorStream(httpURLConnection);
+                    throw new StatusCodeNot200Exception(urlStr, params, responseCode);
                 }
-            } catch (IOException e) {
-                logHttpURLConnectionErrorStream(httpURLConnection);
-                e.printStackTrace();
-                throw e;
+            } catch (RedirectException re) {
+                return request.post(re.getUrl());
+            }
+        } catch (IOException e) {
+            logHttpURLConnectionErrorStream(httpURLConnection);
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
+        }
+
+        log.debug(buildLog("请求返回: " + result));
+
+        return result;
+    }
+
+    private static String sentFile(Request request) throws IOException {
+
+        String url = request.getUrl();
+        Map<String, String> header = request.getHeader();
+        Map<String, Object> params = request.getParam();
+
+        String BOUNDARY = UUID.randomUUID().toString();
+        String PREFIX = "--";
+        String LINE_END = "\r\n";
+        String MULTIPART_FROM_DATA = "multipart/form-data";
+        String CHARSET = "UTF-8";
+
+        HttpURLConnection httpURLConnection = null;
+        String result = null;
+
+        try {
+            URL uri = new URL(url);
+
+            httpURLConnection = (HttpURLConnection) uri.openConnection();
+            httpURLConnection.setReadTimeout(5000);
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setUseCaches(false);
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setRequestProperty("Charset", CHARSET);
+            httpURLConnection.setRequestProperty("Content-Type", MULTIPART_FROM_DATA + ";boundary=" + BOUNDARY);
+
+            addHeaderToHttpURLConnection(header, httpURLConnection);
+
+            OutputStream out = null;
+            try {
+                out = new BufferedOutputStream(httpURLConnection.getOutputStream());
+
+                for (String key : params.keySet()) {
+                    Object param = params.get(key);
+                    if (param != null) {
+                        if (param instanceof File) {
+                            File file = (File) param;
+                            StringBuilder stringBuilder = new StringBuilder();
+                            stringBuilder.append(PREFIX);
+                            stringBuilder.append(BOUNDARY);
+                            stringBuilder.append(LINE_END);
+                            stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END);
+                            stringBuilder.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END);
+                            stringBuilder.append(LINE_END);
+
+                            out.write(stringBuilder.toString().getBytes("UTF-8"));
+                            FileInputStream fileInputStream = null;
+
+                            try {
+                                fileInputStream = new FileInputStream(file);
+                                byte[] buffer = new byte[1024];
+                                int len = 0;
+                                while ((len = fileInputStream.read(buffer)) != -1) {
+                                    out.write(buffer, 0, len);
+                                }
+                            } finally {
+                                if (fileInputStream != null) {
+                                    try {
+                                        fileInputStream.close();
+                                    } catch (IOException e) {
+                                        fileInputStream = null;
+                                    }
+                                }
+                            }
+                            out.write(LINE_END.getBytes("UTF-8"));
+                        } else {
+                            String paramStr = param.toString();
+                            StringBuilder stringBuilder = new StringBuilder();
+                            stringBuilder.append(PREFIX);
+                            stringBuilder.append(BOUNDARY);
+                            stringBuilder.append(LINE_END);
+                            stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"" + LINE_END);
+                            stringBuilder.append("Content-Type: text/plain; charset=" + CHARSET + LINE_END);
+                            stringBuilder.append(LINE_END);
+                            stringBuilder.append(paramStr);
+                            stringBuilder.append(LINE_END);
+
+                            out.write(stringBuilder.toString().getBytes("UTF-8"));
+                        }
+                    }
+                }
+
+                out.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes());
+                out.flush();
             } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
+                if(out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        out = null;
+                    }
                 }
             }
 
-            log.debug(buildLog("请求返回: " + result));
-
-            return result;
+            try {
+                int responseCode = httpURLConnection.getResponseCode();
+                if (responseCode == 200) {
+                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+                } else if (300 < responseCode && responseCode < 400) {
+                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
+                } else {
+                    logHttpURLConnectionErrorStream(httpURLConnection);
+                    throw new StatusCodeNot200Exception(url, params, responseCode);
+                }
+            } catch (RedirectException re) {
+                return request.post(re.getUrl());
+            }
+        } catch (IOException e) {
+            logHttpURLConnectionErrorStream(httpURLConnection);
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (httpURLConnection != null) {
+                httpURLConnection.disconnect();
+            }
         }
+
+        log.debug(buildLog("请求返回: " + result));
+
+        return result;
     }
 }

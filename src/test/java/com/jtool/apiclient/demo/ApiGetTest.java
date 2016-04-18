@@ -17,7 +17,6 @@ public class ApiGetTest {
 
     @Test
     public void getTest() throws Exception {
-
         Assert.assertEquals("{}", Api().get("http://chat.palm-chat.cn/TestServer/sentGet"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().get("http://chat.palm-chat.cn/TestServer/sentGet?name=中文名"), ResponsePeople.class);
