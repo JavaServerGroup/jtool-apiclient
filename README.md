@@ -1,5 +1,5 @@
 # jtool-apiclient
-简易基于http的api请求客户端   
+简易基于http的api请求客户端。不依赖其他库直接使用HttpURLConnection，支持keepalives。支持map和pojo作为请求参数。支持设置header。默认支持jtool的_logId日志系统。
 
 #Quick start
 1.添加jtool的github的repository
@@ -43,7 +43,7 @@ Map<String, String> header = new HashMap<String, String>();
 header.put("Authorization", "Basic xxx");
 Api().header(header).post("http://www.example.org");
 ```
-###param方法。当请求需要单上参数:   
+###param方法。当请求需要带上参数:   
 带pojo参数：
 ```java
 public class User{
