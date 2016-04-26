@@ -295,7 +295,7 @@ public class ApiClient {
                             stringBuilder.append(BOUNDARY);
                             stringBuilder.append(LINE_END);
                             stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END);
-                            stringBuilder.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END);
+                            stringBuilder.append("Content-Type: " + getContentTypeByFilename(file.getName()) + "; charset=" + CHARSET + LINE_END);
                             stringBuilder.append(LINE_END);
 
                             out.write(stringBuilder.toString().getBytes("UTF-8"));
@@ -373,5 +373,13 @@ public class ApiClient {
         log.debug(buildLog("请求返回: " + result));
 
         return result;
+    }
+
+    public static void main(String[] args) {
+
+        String str = "xxxxjpg";
+        System.out.println(str.contains("."));
+        System.out.println(str.lastIndexOf("."));
+        System.out.println(str.substring(str.lastIndexOf(".")));
     }
 }

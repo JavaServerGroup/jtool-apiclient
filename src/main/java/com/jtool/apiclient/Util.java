@@ -137,7 +137,26 @@ class Util {
         } catch(IOException ex) {
             ex.printStackTrace();
         }
-
     }
 
+    static String getContentTypeByFilename(String filename) {
+
+        int index = filename.lastIndexOf(".");
+
+        if(index == -1) {
+            return "application/octet-stream";
+        }
+
+        String suffix = filename.substring(index);
+
+        if(".gif".equalsIgnoreCase(suffix)) {
+            return "image/gif";
+        } else if(".jpg".equalsIgnoreCase(suffix) || ".jpeg".equalsIgnoreCase(suffix)){
+            return "image/jpeg";
+        } else if(".png".equalsIgnoreCase(suffix)) {
+            return "image/png";
+        } else {
+            return "application/octet-stream";
+        }
+    }
 }
