@@ -14,13 +14,6 @@
         <id>jtool-mvn-repository</id>
         <url>https://raw.github.com/JavaServerGroup/jtool-mvn-repository/master/releases</url>
     </repository>
-    <repository>
-        <id>jtool-mvn-snapshots</id>
-        <url>https://raw.github.com/JavaServerGroup/jtool-mvn-snapshots/master/snapshots</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
 </repositories>
 ```
 2.添加依赖
