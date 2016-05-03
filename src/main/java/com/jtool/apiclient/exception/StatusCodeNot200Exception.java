@@ -14,18 +14,12 @@ public class StatusCodeNot200Exception extends RuntimeException {
 	private String url;
 	private int statusCode;
 	private Map<String, Object> params;
-
-	public StatusCodeNot200Exception(String url, int statusCode) {
-		this.url = url;
-		this.statusCode = statusCode;
-		logger.debug(statusCode + "");
-	}
 	
 	public StatusCodeNot200Exception(String url, Map<String, Object> params, int statusCode) {
 		this.url = url;
 		this.params = params;
 		this.statusCode = statusCode;
-		logger.error(this.getStatusCode() + "\t" + this.getUrl() + "\t" + this.getParams().toString(), this);
+		logger.error(this.getStatusCode() + "\t" + this.getUrl() + "\t" + this.getParams(), this);
 	}
 
 	public String getUrl() {

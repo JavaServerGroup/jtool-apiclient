@@ -1,10 +1,10 @@
 package com.jtool.apiclient;
 
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
-import com.jtool.support.log.LogPojo;
-import com.jtool.support.log.LogThreadLocal;
+import com.jtool.support.log.LogFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -14,13 +14,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.jtool.apiclient.Util.*;
-import static com.jtool.support.log.LogBuilder.buildLog;
 
 public class ApiClient {
 
-    private static Logger log = LoggerFactory.getLogger(ApiClient.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiClient.class.getName());
 
-    public static Request Api(){
+    public static Request Api() {
         return new Request();
     }
 
@@ -31,27 +30,26 @@ public class ApiClient {
 
         private Map<String, String> header;
         private Map<String, Object> param;
-        private boolean needLog = true;
         private String _logId;
         private String url;
 
-        public Request header(Map<String, String> header){
+        public Request header(Map<String, String> header) {
             //header方法应该只调用一次
-            if(this.header != null){
+            if (this.header != null) {
                 throw new IllegalArgumentException("header方法应该只调用一次");
             }
             this.header = header;
             return this;
         }
 
-        public Request param(Object param){
+        public Request param(Object param) {
             //param方法应该只调用一次
-            if(this.param != null){
+            if (this.param != null) {
                 throw new IllegalArgumentException("param方法应该只调用一次");
             }
 
-            if(param instanceof Map){
-                this.param = (Map)param;
+            if (param instanceof Map) {
+                this.param = (Map) param;
             } else {
                 this.param = Util.bean2Map(param);
             }
@@ -59,56 +57,31 @@ public class ApiClient {
             return this;
         }
 
-        public Request needLog(boolean needLog){
-            this.needLog = needLog;
-            return this;
-        }
-
-        public Request logId(String _logId){
+        public Request logId(String _logId) {
             this._logId = _logId;
             return this;
         }
 
         public String get(String url) throws IOException {
             this.url = url;
-            Map<String, Object> params = this.getParam();
-
-            if(params == null) {
-                params = new HashMap<String, Object>();
-            }
-
-            if(this.needLog) {
-                if(this._logId != null && !"".equals(this._logId)) {
-                    params.put(LogPojo.logKey, this._logId);
-                } else {
-                    params.put(LogPojo.logKey, LogThreadLocal.getLogId());
-                }
-            }
-
-            this.param = params;
-
+            addLogSeed();
             return processGet(this);
         }
 
         public String post(String url) throws IOException {
             this.url = url;
-            Map<String, Object> params = this.getParam();
-
-            if(params == null) {
-                params = new HashMap<String, Object>();
-            }
-
-            if(this.needLog) {
-                if(this._logId != null && !"".equals(this._logId)) {
-                    params.put(LogPojo.logKey, this._logId);
-                } else {
-                    params.put(LogPojo.logKey, LogThreadLocal.getLogId());
-                }
-            }
-
-            this.param = params;
-
+            addLogSeed();
             return processPost(this);
+        }
+
+        private void addLogSeed() {
+            Map<String, String> header = this.header == null ? new HashMap<String, String>() : this.header;
+            if (this._logId != null && !"".equals(this._logId)) {
+                header.put(LogFilter.JTOOL_LOG_ID, this._logId);
+            } else if(MDC.get(LogFilter.JTOOL_LOG_ID) != null){
+                header.put(LogFilter.JTOOL_LOG_ID, MDC.get(LogFilter.JTOOL_LOG_ID));
+            }
+            this.header = header;
         }
 
         private Map<String, String> getHeader() {
@@ -122,8 +95,6 @@ public class ApiClient {
         private String getUrl() {
             return url;
         }
-
-
     }
 
     private static String processGet(Request request) throws IOException {
@@ -134,11 +105,15 @@ public class ApiClient {
 
         String paramsString = Util.params2paramsStr(params);
 
-        if(!"".equals(paramsString)) {
-            urlStr += "?" + paramsString;
+        if (!"".equals(paramsString)) {
+            if (urlStr.contains("?")) {
+                urlStr += "&" + paramsString;
+            } else {
+                urlStr += "?" + paramsString;
+            }
         }
 
-        log.debug(buildLog("发送请求: curl " + makeHeaderLogString(header) +  " '" + urlStr + "'"));
+        log.debug("发送请求: curl " + makeHeaderLogString(header) + " '" + urlStr + "'");
 
         HttpURLConnection httpURLConnection = null;
         String result = null;
@@ -149,19 +124,14 @@ public class ApiClient {
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
             addHeaderToHttpURLConnection(header, httpURLConnection);
 
-            try {
-                int responseCode = httpURLConnection.getResponseCode();
-                if (responseCode == 200) {
-                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                } else if (300 < responseCode && responseCode < 400) {
-                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                } else {
-                    logHttpURLConnectionErrorStream(httpURLConnection);
-                    throw new StatusCodeNot200Exception(urlStr, params, responseCode);
-                }
-            } catch (RedirectException re) {
-                return request.get(re.getUrl());
+            int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode == 200) {
+                result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+            } else {
+                logHttpURLConnectionErrorStream(httpURLConnection);
+                throw new StatusCodeNot200Exception(urlStr, params, responseCode);
             }
+
         } catch (IOException e) {
             logHttpURLConnectionErrorStream(httpURLConnection);
             e.printStackTrace();
@@ -172,7 +142,7 @@ public class ApiClient {
             }
         }
 
-        log.debug(buildLog("请求返回: " + result));
+        log.debug("请求返回: " + result);
 
         return result;
     }
@@ -185,9 +155,9 @@ public class ApiClient {
 
         String paramsString = Util.params2paramsStr(params);
 
-        log.debug(buildLog("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header) + " -X POST -d '" + paramsString + "'"));
+        log.debug("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header) + " -X POST -d '" + paramsString + "'");
 
-        if(isPostFile(params)) {
+        if (isPostFile(params)) {
             return sentFile(request);
         }
 
@@ -202,7 +172,7 @@ public class ApiClient {
 
             addHeaderToHttpURLConnection(header, httpURLConnection);
 
-            if(!"".equals(paramsString)) {
+            if (!"".equals(paramsString)) {
                 httpURLConnection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
                 byte[] data = paramsString.getBytes("UTF-8");
                 httpURLConnection.setFixedLengthStreamingMode(data.length);
@@ -213,7 +183,7 @@ public class ApiClient {
                     out.write(data);
                     out.flush();
                 } finally {
-                    if(out != null) {
+                    if (out != null) {
                         try {
                             out.close();
                         } catch (IOException e) {
@@ -225,19 +195,14 @@ public class ApiClient {
                 httpURLConnection.setFixedLengthStreamingMode(0);
             }
 
-            try {
-                int responseCode = httpURLConnection.getResponseCode();
-                if (responseCode == 200) {
-                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                } else if (300 < responseCode && responseCode < 400) {
-                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                } else {
-                    logHttpURLConnectionErrorStream(httpURLConnection);
-                    throw new StatusCodeNot200Exception(urlStr, params, responseCode);
-                }
-            } catch (RedirectException re) {
-                return request.post(re.getUrl());
+            int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode == 200) {
+                result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+            } else {
+                logHttpURLConnectionErrorStream(httpURLConnection);
+                throw new StatusCodeNot200Exception(urlStr, params, responseCode);
             }
+
         } catch (IOException e) {
             logHttpURLConnectionErrorStream(httpURLConnection);
             e.printStackTrace();
@@ -248,7 +213,7 @@ public class ApiClient {
             }
         }
 
-        log.debug(buildLog("请求返回: " + result));
+        log.debug("请求返回: " + result);
 
         return result;
     }
@@ -338,7 +303,7 @@ public class ApiClient {
                 out.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes());
                 out.flush();
             } finally {
-                if(out != null) {
+                if (out != null) {
                     try {
                         out.close();
                     } catch (IOException e) {
@@ -347,18 +312,12 @@ public class ApiClient {
                 }
             }
 
-            try {
-                int responseCode = httpURLConnection.getResponseCode();
-                if (responseCode == 200) {
-                    result = Util.readAndCloseStream(httpURLConnection.getInputStream());
-                } else if (300 < responseCode && responseCode < 400) {
-                    throw new RedirectException(httpURLConnection.getHeaderField("Location"));
-                } else {
-                    logHttpURLConnectionErrorStream(httpURLConnection);
-                    throw new StatusCodeNot200Exception(url, params, responseCode);
-                }
-            } catch (RedirectException re) {
-                return request.post(re.getUrl());
+            int responseCode = httpURLConnection.getResponseCode();
+            if (responseCode == 200) {
+                result = Util.readAndCloseStream(httpURLConnection.getInputStream());
+            } else {
+                logHttpURLConnectionErrorStream(httpURLConnection);
+                throw new StatusCodeNot200Exception(url, params, responseCode);
             }
         } catch (IOException e) {
             logHttpURLConnectionErrorStream(httpURLConnection);
@@ -370,16 +329,8 @@ public class ApiClient {
             }
         }
 
-        log.debug(buildLog("请求返回: " + result));
+        log.debug("请求返回: " + result);
 
         return result;
-    }
-
-    public static void main(String[] args) {
-
-        String str = "xxxxjpg";
-        System.out.println(str.contains("."));
-        System.out.println(str.lastIndexOf("."));
-        System.out.println(str.substring(str.lastIndexOf(".")));
     }
 }

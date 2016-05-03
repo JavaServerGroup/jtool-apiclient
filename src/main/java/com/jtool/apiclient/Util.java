@@ -13,8 +13,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jtool.support.log.LogBuilder.buildLog;
-
 class Util {
 
     private static Logger log = LoggerFactory.getLogger(Util.class);
@@ -91,7 +89,7 @@ class Util {
                 }
             }
         } catch (Exception e) {
-            log.debug(buildLog("将bean转化为map时发生错误：" + obj));
+            log.debug("将bean转化为map时发生错误：" + obj);
         }
 
         return map;
@@ -132,7 +130,7 @@ class Util {
         try {
             if(httpURLConnection != null) {
                 String errorStream = Util.readAndCloseStream(httpURLConnection.getErrorStream());
-                log.error(buildLog("访问发生异常，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + errorStream));
+                log.error("访问发生异常，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + errorStream);
             }
         } catch(IOException ex) {
             ex.printStackTrace();
