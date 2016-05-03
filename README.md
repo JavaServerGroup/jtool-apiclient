@@ -1,4 +1,5 @@
-# jtool-apiclient
+# jtool-apiclient    [![Build Status](https://travis-ci.org/JavaServerGroup/jtool-apiclient.svg?branch=master)](https://travis-ci.org/JavaServerGroup/jtool-apiclient)[![Coverage Status](https://coveralls.io/repos/github/JavaServerGroup/jtool-apiclient/badge.svg?branch=master)](https://coveralls.io/github/JavaServerGroup/jtool-apiclient?branch=master)
+
 简易基于http的api请求客户端。不依赖其他库直接使用HttpURLConnection，支持keepalives。支持map和pojo作为请求参数。支持设置header。默认支持jtool的_logId日志系统。
 
 #Quick start
