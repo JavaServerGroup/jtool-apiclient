@@ -60,7 +60,7 @@ User user = new User();
 user.setName("Andy");
 Api().param(user).post("http://www.example.org");
 ```
-带Map参数（推荐：Map<String, Object>）：
+带Map参数（推荐：Map&lt;String, Object&gt;）：
 ```java
 //普通参数
 Map<String, Object> user = new HashMap<>();
