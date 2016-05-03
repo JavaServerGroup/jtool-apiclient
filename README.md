@@ -71,11 +71,8 @@ uploadImgParam.put("fileName", "myphoto");
 Api().param(uploadImgParam).post("http:/www.example.org");
 ```
 #关于jtool的_logId的说明
-get/post方法默认会添加一个_logId参数到你的请求，如果要禁止这个功能，可以调用needLog(false)默认为true:
-```java
-Api().needLog(false).get("http://www.example.org");
-```
-_logId参数来自于ThreadLocal,当需要别的线程发送又希望请求带上_logId, 可以手动设置_logId:
+get/post方法默认会添加一个_logId参数到你的header
+_logId参数来自于MDC,当需要别的线程发送又希望请求带上_logId, 可以手动设置_logId:
 ```java
 Api().logId("a_random_logId").get("http://www.example.org");
 ```
