@@ -1,10 +1,9 @@
 package com.jtool.apiclient;
 
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
-import com.jtool.support.log.LogFilter;
+import com.jtool.support.log.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -80,9 +79,9 @@ public class ApiClient {
         private void addLogSeed() {
             Map<String, String> header = this.header == null ? new HashMap<String, String>() : this.header;
             if (this._logId != null && !"".equals(this._logId)) {
-                header.put(LogFilter.JTOOL_LOG_ID, this._logId);
-            } else if(MDC.get(LogFilter.JTOOL_LOG_ID) != null){
-                header.put(LogFilter.JTOOL_LOG_ID, MDC.get(LogFilter.JTOOL_LOG_ID));
+                header.put(LogHelper.JTOOL_LOG_ID, this._logId);
+            } else if(LogHelper.getLogId() != null){
+                header.put(LogHelper.JTOOL_LOG_ID, LogHelper.getLogId());
             }
             this.header = header;
         }
