@@ -14,13 +14,6 @@
         <id>jtool-mvn-repository</id>
         <url>https://raw.github.com/JavaServerGroup/jtool-mvn-repository/master/releases</url>
     </repository>
-    <repository>
-        <id>jtool-mvn-snapshots</id>
-        <url>https://raw.github.com/JavaServerGroup/jtool-mvn-snapshots/master/snapshots</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
 </repositories>
 ```
 2.添加依赖
@@ -60,7 +53,7 @@ User user = new User();
 user.setName("Andy");
 Api().param(user).post("http://www.example.org");
 ```
-带Map参数（推荐：Map<String, Object>）：
+带Map参数（推荐：Map&lt;String, Object&gt;）：
 ```java
 //普通参数
 Map<String, Object> user = new HashMap<>();
