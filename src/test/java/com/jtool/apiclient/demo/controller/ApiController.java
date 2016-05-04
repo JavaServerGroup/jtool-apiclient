@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.PeopleRequest;
 import com.jtool.apiclient.demo.model.ResponsePeople;
-import com.jtool.support.log.LogFilter;
+import com.jtool.support.log.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -67,14 +67,14 @@ public class ApiController {
         Map<String, String> header = new HashMap<String, String>();
         header.put("myHeader1", request.getHeader("myHeader1"));
         header.put("myHeader2", request.getHeader("myHeader2"));
-        header.put(LogFilter.JTOOL_LOG_ID, request.getHeader(LogFilter.JTOOL_LOG_ID));
+        header.put(LogHelper.JTOOL_LOG_ID, request.getHeader(LogHelper.JTOOL_LOG_ID));
         return JSON.toJSONString(header);
     }
 
     @ResponseBody
     @RequestMapping(value = "/forTestNeedLog", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public String forTestNeedLog(HttpServletRequest request) {
-        String _logId = request.getParameter(LogFilter.JTOOL_LOG_ID);
+        String _logId = request.getParameter(LogHelper.JTOOL_LOG_ID);
         if(null != _logId && !"".equals(_logId)){
             return "true";
         } else {
@@ -85,7 +85,7 @@ public class ApiController {
     @ResponseBody
     @RequestMapping(value = "/forTestSetLogId", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public String forTestSetLogId(HttpServletRequest request) {
-        return request.getHeader(LogFilter.JTOOL_LOG_ID);
+        return request.getHeader(LogHelper.JTOOL_LOG_ID);
     }
 
     @RequestMapping(value = "/forTestRedirect", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")

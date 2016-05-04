@@ -4,9 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
-import com.jtool.support.log.LogFilter;
+import com.jtool.support.log.LogHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.MDC;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class ApiClientTest {
 
     @BeforeClass
     public static void setup() {
-        MDC.put(LogFilter.JTOOL_LOG_ID, UUID.randomUUID().toString());
+        LogHelper.setLogId(UUID.randomUUID().toString());
         String[] args = new String[0];
         SpringApplication.run(ApiClientTest.class, args);
     }
