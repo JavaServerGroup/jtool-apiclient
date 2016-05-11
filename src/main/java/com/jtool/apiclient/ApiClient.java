@@ -252,8 +252,9 @@ public class ApiClient {
             try {
                 out = new BufferedOutputStream(httpURLConnection.getOutputStream());
 
-                for (String key : params.keySet()) {
-                    Object param = params.get(key);
+                for(Map.Entry<String, Object> entry : params.entrySet()) {
+                    String key = entry.getKey();
+                    Object param = entry.getValue();
                     if (param != null) {
                         if (param instanceof File) {
                             File file = (File) param;
@@ -302,7 +303,7 @@ public class ApiClient {
                     }
                 }
 
-                out.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes());
+                out.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes("UTF-8"));
                 out.flush();
             } finally {
                 if (out != null) {
@@ -345,7 +346,7 @@ public class ApiClient {
             while ((len = bufferedInputStream.read(buffer)) != -1) {
                 os.write(buffer, 0, len);
             }
-            return os.toString();
+            return os.toString("UTF-8");
         } finally {
             if(os != null) {
                 try {
@@ -364,22 +365,25 @@ public class ApiClient {
     }
 
     private static String params2paramsStr(Map<String, Object> params) {
-        String paramsString = "";
+        StringBuffer paramsString = new StringBuffer();
         if(params != null && params.size() > 0) {
-            for(String paramName : params.keySet()) {
-                if(params.get(paramName) != null) {
-                    if (!"".equals(paramsString)) {
-                        paramsString += "&";
-                    }
-                    try {
-                        paramsString += URLEncoder.encode(paramName, "UTF-8") + "=" + URLEncoder.encode(params.get(paramName).toString(), "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+
+            for(Map.Entry<String, Object> entry : params.entrySet()){
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if(paramsString.length() > 0) {
+                    paramsString.append("&");
+                }
+                try {
+                    paramsString.append(URLEncoder.encode(key, "UTF-8"));
+                    paramsString.append("=");
+                    paramsString.append(URLEncoder.encode(value.toString(), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
         }
-        return paramsString;
+        return paramsString.toString();
     }
 
     private static Map<String, Object> bean2Map(Object obj) {
@@ -406,8 +410,11 @@ public class ApiClient {
                     }
                 }
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             log.debug("将bean转化为map时发生错误：" + obj);
+            throw new RuntimeException("apiClient中将bean转化为map时发生错误");
         }
 
         return map;
@@ -415,8 +422,8 @@ public class ApiClient {
 
     private static void addHeaderToHttpURLConnection(Map<String, String> header, HttpURLConnection httpURLConnection) {
         if(header != null) {
-            for (String key : header.keySet()) {
-                httpURLConnection.setRequestProperty(key, header.get(key));
+            for(Map.Entry<String, String> entry : header.entrySet()) {
+                httpURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
             }
         }
     }
@@ -425,9 +432,8 @@ public class ApiClient {
         if(params == null) {
             return false;
         }
-        for (String key : params.keySet()) {
-            Object param = params.get(key);
-            if (param instanceof File) {
+        for(Map.Entry<String, Object> entry : params.entrySet()) {
+            if(entry.getValue() instanceof File) {
                 return true;
             }
         }
@@ -435,13 +441,19 @@ public class ApiClient {
     }
 
     private static String makeHeaderLogString(Map<String, String> header) {
-        String headerStr = "";
-        if(header != null) {
-            for(String headerKey : header.keySet()) {
-                headerStr += " -H '" + headerKey + ": " + header.get(headerKey) + "' ";
+        if(header == null) {
+            return "";
+        } else {
+            StringBuffer headerStr = new StringBuffer();
+            for(Map.Entry<String, String> entry : header.entrySet()) {
+                headerStr.append(" -H '");
+                headerStr.append(entry.getKey());
+                headerStr.append(": ");
+                headerStr.append(entry.getValue());
+                headerStr.append("' ");
             }
+            return headerStr.toString();
         }
-        return headerStr;
     }
 
     private static void logHttpURLConnectionErrorStream(HttpURLConnection httpURLConnection) {
