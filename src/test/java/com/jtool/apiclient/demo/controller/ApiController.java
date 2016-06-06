@@ -26,9 +26,7 @@ public class ApiController {
     @ResponseBody
     @RequestMapping(value = "/sentGet", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public String sentGet(People people) {
-
         log.debug(people.toString());
-
         return JSON.toJSONString(people);
     }
 

@@ -111,12 +111,23 @@ public class ApiClientTest {
     public void postWithNoParamTest() throws Exception {
         //发送没参数的post请求
         Assert.assertEquals("{}", Api().post(host + "/sentPost"));
+        Assert.assertEquals("{}", Api().restPost(host + "/restPost"));
     }
 
     @Test
     public void postWithUrlParamTest() throws Exception {
         ResponsePeople responsePeople = JSON.parseObject(Api().post(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
+        Assert.assertNull(responsePeople.getAge());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
+    public void restPostWithUrlParamTest() throws Exception {
+        ResponsePeople responsePeople = JSON.parseObject(Api().restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getHeight());
@@ -140,6 +151,20 @@ public class ApiClientTest {
     }
 
     @Test
+    public void restPostWithUrlAndBeanParamTest() throws Exception {
+        People people = new People();
+        people.setAge(30);
+        people.setHeight(1.73);
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
+        Assert.assertEquals(new Integer(30), responsePeople.getAge());
+        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
     public void postWithUrlAndBeanParamTestWithURLEncode() throws Exception {
         People people = new People();
         people.setName("1+1");
@@ -151,6 +176,29 @@ public class ApiClientTest {
         Assert.assertNull(responsePeople.getHeight());
         Assert.assertNull(responsePeople.getArticle());
         Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
+    public void restPostWithUrlAndBeanParamTestWithURLEncode() throws Exception {
+        People people = new People();
+        people.setName("中文名");
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost"), ResponsePeople.class);
+        Assert.assertEquals("中文名", responsePeople.getName());
+        Assert.assertNull(responsePeople.getAge());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void restPostWithUrlAndBeanWithFileParamTest() throws Exception {
+        People people = new People();
+        people.setAge(30);
+        people.setHeight(1.73);
+        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
+        JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
     }
 
     @Test

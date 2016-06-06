@@ -4,7 +4,7 @@
   <groupId>com.jtool</groupId>
   <artifactId>jtool-apiclient</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -50,6 +50,11 @@
       <artifactId>jtool-support</artifactId>
       <version>0.0.2</version>
     </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.12</version>
+    </dependency>
 
     <!--测试-->
     <dependency>
@@ -68,15 +73,15 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
-      <version>1.2.7</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.21</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -1,5 +1,6 @@
 package com.jtool.apiclient;
 
+import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
 import com.jtool.support.log.LogHelper;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class ApiClient {
         private Map<String, Object> param;
         private String _logId;
         private String url;
+        private boolean isRest;
 
         private Request() {
         }
@@ -73,6 +75,13 @@ public class ApiClient {
         public String post(String url) throws IOException {
             this.url = url;
             addLogSeed();
+            return processPost(this);
+        }
+
+        public String restPost(String url) throws IOException {
+            this.url = url;
+            addLogSeed();
+            this.isRest = true;
             return processPost(this);
         }
 
@@ -155,9 +164,14 @@ public class ApiClient {
         Map<String, String> header = request.getHeader();
         Map<String, Object> params = request.getParam();
 
-        String paramsString = params2paramsStr(params);
+        String paramsString;
+        if(request.isRest) {
+            paramsString = JSON.toJSONString(params);
+        } else {
+            paramsString = params2paramsStr(params);
+        }
 
-        log.debug("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header) + " -X POST -d '" + paramsString + "'");
+        log.debug("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header, request.isRest) + " -X POST -d '" + paramsString + "'");
 
         if (isPostFile(params)) {
             return sentFile(request);
@@ -175,7 +189,11 @@ public class ApiClient {
             addHeaderToHttpURLConnection(header, httpURLConnection);
 
             if (!"".equals(paramsString)) {
-                httpURLConnection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+                if(request.isRest) {
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                } else {
+                    httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+                }
                 byte[] data = paramsString.getBytes("UTF-8");
                 httpURLConnection.setFixedLengthStreamingMode(data.length);
 
@@ -440,7 +458,7 @@ public class ApiClient {
         return false;
     }
 
-    private static String makeHeaderLogString(Map<String, String> header) {
+    private static String makeHeaderLogString(Map<String, String> header, boolean isRest) {
         if(header == null) {
             return "";
         } else {
@@ -452,8 +470,17 @@ public class ApiClient {
                 headerStr.append(entry.getValue());
                 headerStr.append("' ");
             }
+
+            if(isRest) {
+                headerStr.append(" -H 'Content-Type:application/json' ");
+            }
+
             return headerStr.toString();
         }
+    }
+
+    private static String makeHeaderLogString(Map<String, String> header) {
+        return makeHeaderLogString(header, false);
     }
 
     private static void logHttpURLConnectionErrorStream(HttpURLConnection httpURLConnection) {
