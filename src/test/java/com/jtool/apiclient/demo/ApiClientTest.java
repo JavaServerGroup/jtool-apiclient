@@ -14,10 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.jtool.apiclient.ApiClient.Api;
 
@@ -104,7 +101,7 @@ public class ApiClientTest {
 
     @Test(expected = IOException.class)
     public void getIoException() throws Exception {
-        Api().get("http://xxx.abc");
+        Api().get("http://www");
     }
 
     @Test
@@ -197,7 +194,7 @@ public class ApiClientTest {
         People people = new People();
         people.setAge(30);
         people.setHeight(1.73);
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
         JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
     }
 
@@ -207,7 +204,7 @@ public class ApiClientTest {
         People people = new People();
         people.setAge(30);
         people.setHeight(1.73);
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
@@ -219,10 +216,56 @@ public class ApiClientTest {
     }
 
     @Test
+    public void postWithMutiImages() throws Exception {
+
+        People people = new People();
+        people.setAge(30);
+        people.setHeight(1.73);
+
+        List<File> images = new ArrayList<File>();
+        images.add(new File("src/test/resources/media/g.gif"));
+        images.add(new File("src/test/resources/media/j.jpg"));
+        people.setImgs(images);
+
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        Assert.assertEquals("中文名", responsePeople.getName());
+        Assert.assertEquals(new Integer(30), responsePeople.getAge());
+        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getArticle());
+
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getImgs().get(0))), responsePeople.getImgs().get(0));
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getImgs().get(1))), responsePeople.getImgs().get(1));
+    }
+
+    @Test
+    public void postWithMutiImagesByMap() throws Exception {
+
+        Map<String, Object> params = new HashMap<String, Object>();
+
+        List<File> images = new ArrayList<File>();
+        File file1 = new File("src/test/resources/media/g.gif");
+        File file2 = new File("src/test/resources/media/j.jpg");
+        images.add(file1);
+        images.add(file2);
+
+        params.put("imgs", images);
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        Assert.assertEquals("中文名", responsePeople.getName());
+
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
+        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file2)), responsePeople.getImgs().get(1));
+    }
+
+    @Test
     public void mypostWithUrlAndBeanWithFileParamTest() throws Exception {
 
         People people = new People();
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost"), ResponsePeople.class);
         Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
@@ -236,8 +279,8 @@ public class ApiClientTest {
         People people = new People();
         people.setAge(30);
         people.setHeight(1.73);
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
-        people.setGallery(new File(ApiClientTest.class.getResource("/media/j.jpg").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
+        people.setGallery(new File("src/test/resources/media/j.jpg"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
@@ -255,9 +298,9 @@ public class ApiClientTest {
         people.setName("中文名");
         people.setAge(30);
         people.setHeight(1.73);
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
-        people.setGallery(new File(ApiClientTest.class.getResource("/media/j.jpg").getFile()));
-        people.setArticle(new File(ApiClientTest.class.getResource("/media/myarticle.txt").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
+        people.setGallery(new File("src/test/resources/media/j.jpg"));
+        people.setArticle(new File("src/test/resources/media/myarticle.txt"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
@@ -287,14 +330,14 @@ public class ApiClientTest {
         people.setName("中文名");
         people.setAge(30);
         people.setHeight(1.73);
-        people.setAvatar(new File(ApiClientTest.class.getResource("/media/g.gif").getFile()));
+        people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        Api().param(people).post("http://xxx.abc");
+        Api().param(people).post("http://www");
     }
 
     @Test(expected = IOException.class)
     public void postIoException() throws Exception {
-        Api().post("http://xxx.abc");
+        Api().post("http://www");
     }
 
     @Test(expected = IllegalArgumentException.class)

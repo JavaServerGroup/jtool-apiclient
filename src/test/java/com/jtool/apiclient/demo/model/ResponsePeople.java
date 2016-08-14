@@ -1,5 +1,7 @@
 package com.jtool.apiclient.demo.model;
 
+import java.util.List;
+
 public class ResponsePeople {
     private String name;
     private Integer age;
@@ -7,6 +9,8 @@ public class ResponsePeople {
     private String avatar;
     private String gallery;
     private String article;
+    private List<String> imgs;
+
     public String getName() {
         return name;
     }
@@ -55,6 +59,14 @@ public class ResponsePeople {
         this.article = article;
     }
 
+    public List<String> getImgs() {
+        return imgs;
+    }
+
+    public void setImgs(List<String> imgs) {
+        this.imgs = imgs;
+    }
+
     @Override
     public String toString() {
         return "ResponsePeople{" +
@@ -64,6 +76,7 @@ public class ResponsePeople {
                 ", avatar='" + avatar + '\'' +
                 ", gallery='" + gallery + '\'' +
                 ", article='" + article + '\'' +
+                ", imgs=" + imgs +
                 '}';
     }
 }

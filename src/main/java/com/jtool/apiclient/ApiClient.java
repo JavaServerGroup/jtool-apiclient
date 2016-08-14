@@ -15,12 +15,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class ApiClient {
 
     private static final Logger log = LoggerFactory.getLogger(ApiClient.class.getName());
+
+    private static String PREFIX = "--";
+    private static String LINE_END = "\r\n";
+    private static String MULTIPART_FROM_DATA = "multipart/form-data";
+    private static String CHARSET = "UTF-8";
 
     public static Request Api() {
         return new Request();
@@ -245,11 +251,6 @@ public class ApiClient {
         Map<String, Object> params = request.getParam();
 
         String BOUNDARY = UUID.randomUUID().toString();
-        String PREFIX = "--";
-        String LINE_END = "\r\n";
-        String MULTIPART_FROM_DATA = "multipart/form-data";
-        String CHARSET = "UTF-8";
-
         HttpURLConnection httpURLConnection = null;
         String result = null;
 
@@ -274,36 +275,13 @@ public class ApiClient {
                     String key = entry.getKey();
                     Object param = entry.getValue();
                     if (param != null) {
-                        if (param instanceof File) {
-                            File file = (File) param;
-                            StringBuilder stringBuilder = new StringBuilder();
-                            stringBuilder.append(PREFIX);
-                            stringBuilder.append(BOUNDARY);
-                            stringBuilder.append(LINE_END);
-                            stringBuilder.append("Content-Disposition: form-data;name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END);
-                            stringBuilder.append("Content-Type: " + getContentTypeByFilename(file.getName()) + "; charset=" + CHARSET + LINE_END);
-                            stringBuilder.append(LINE_END);
 
-                            out.write(stringBuilder.toString().getBytes("UTF-8"));
-                            FileInputStream fileInputStream = null;
-
-                            try {
-                                fileInputStream = new FileInputStream(file);
-                                byte[] buffer = new byte[1024];
-                                int len = 0;
-                                while ((len = fileInputStream.read(buffer)) != -1) {
-                                    out.write(buffer, 0, len);
-                                }
-                            } finally {
-                                if (fileInputStream != null) {
-                                    try {
-                                        fileInputStream.close();
-                                    } catch (IOException e) {
-                                        fileInputStream = null;
-                                    }
-                                }
+                        if(param instanceof List && ((List)param).size() > 0 && ((List)param).get(0) instanceof File) {
+                            for(Object file : ((List)param)) {
+                                genPostFile(key, (File)file, out, BOUNDARY);
                             }
-                            out.write(LINE_END.getBytes("UTF-8"));
+                        } else if (param instanceof File) {
+                            genPostFile(key, (File) param, out, BOUNDARY);
                         } else {
                             String paramStr = param.toString();
                             StringBuilder stringBuilder = new StringBuilder();
@@ -353,6 +331,37 @@ public class ApiClient {
         log.debug("请求返回: " + result);
 
         return result;
+    }
+
+    private static void genPostFile(String key, File file, OutputStream out, String BOUNDARY) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(PREFIX);
+        stringBuilder.append(BOUNDARY);
+        stringBuilder.append(LINE_END);
+        stringBuilder.append("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END);
+        stringBuilder.append("Content-Type: " + getContentTypeByFilename(file.getName()) + "; charset=" + CHARSET + LINE_END);
+        stringBuilder.append(LINE_END);
+
+        out.write(stringBuilder.toString().getBytes("UTF-8"));
+        FileInputStream fileInputStream = null;
+
+        try {
+            fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = fileInputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    fileInputStream = null;
+                }
+            }
+        }
+        out.write(LINE_END.getBytes("UTF-8"));
     }
 
     private static String readAndCloseStream(InputStream is) throws IOException {
@@ -453,6 +462,13 @@ public class ApiClient {
         for(Map.Entry<String, Object> entry : params.entrySet()) {
             if(entry.getValue() instanceof File) {
                 return true;
+            } else if(entry.getValue() instanceof List) {
+                List list = (List)entry.getValue();
+                for(int i = 0; i < list.size(); i++) {
+                    if(list.get(i) instanceof File) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
