@@ -14,10 +14,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ApiClient {
 
@@ -276,7 +273,7 @@ public class ApiClient {
                     Object param = entry.getValue();
                     if (param != null) {
 
-                        if(param instanceof List && ((List)param).size() > 0 && ((List)param).get(0) instanceof File) {
+                        if(param instanceof List && ((List)param).size() > 0 && allListItemIsFile((List)param)) {
                             for(Object file : ((List)param)) {
                                 genPostFile(key, (File)file, out, BOUNDARY);
                             }
@@ -456,22 +453,52 @@ public class ApiClient {
     }
 
     private static boolean isPostFile(Map<String, Object> params) {
-        if(params == null) {
-            return false;
-        }
-        for(Map.Entry<String, Object> entry : params.entrySet()) {
-            if(entry.getValue() instanceof File) {
-                return true;
-            } else if(entry.getValue() instanceof List) {
-                List list = (List)entry.getValue();
-                for(int i = 0; i < list.size(); i++) {
-                    if(list.get(i) instanceof File) {
-                        return true;
+        boolean result = false;
+
+        if(params != null) {
+            for(Map.Entry<String, Object> entry : params.entrySet()) {
+                if(entry.getValue() instanceof File) {
+                    result = true;
+                }
+                if(entry.getValue() instanceof List && listItemHasFile((List)entry.getValue())) {
+                    if(allListItemIsFile((List)entry.getValue())) {
+                        result = true;
+                    } else {
+                        throw new RuntimeException("列表的项应该全为File");
                     }
                 }
             }
         }
+
+        return result;
+    }
+
+    private static boolean listItemHasFile(List list){
+
+        Iterator iterator = list.iterator();
+
+        while (iterator.hasNext()) {
+            Object obj = iterator.next();
+            if(obj instanceof File) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    private static boolean allListItemIsFile(List list){
+
+        Iterator iterator = list.iterator();
+
+        while (iterator.hasNext()) {
+            Object obj = iterator.next();
+            if(!(obj instanceof File)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static String makeHeaderLogString(Map<String, String> header, boolean isRest) {
