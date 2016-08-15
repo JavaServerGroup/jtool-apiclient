@@ -36,6 +36,8 @@ public class ApiClient {
         private String _logId;
         private String url;
         private boolean isRest;
+        private int connectionTimeout = 30000;
+        private int readTimeout = 30000;
 
         private Request() {
         }
@@ -46,6 +48,22 @@ public class ApiClient {
                 throw new IllegalArgumentException("header方法应该只调用一次");
             }
             this.header = header;
+            return this;
+        }
+
+        public Request setConnectionTimeout(int connectionTimeout) {
+            if (connectionTimeout < 1) {
+                throw new IllegalArgumentException("超时时间必须大于0");
+            }
+            this.connectionTimeout = connectionTimeout;
+            return this;
+        }
+
+        public Request setReadTimeout(int readTimeout) {
+            if (connectionTimeout < 1) {
+                throw new IllegalArgumentException("超时时间必须大于0");
+            }
+            this.readTimeout = readTimeout;
             return this;
         }
 
@@ -136,6 +154,8 @@ public class ApiClient {
             URL mURL = new URL(urlStr);
             httpURLConnection = (HttpURLConnection) mURL.openConnection();
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            httpURLConnection.setConnectTimeout(request.connectionTimeout);
+            httpURLConnection.setReadTimeout(request.readTimeout);
             addHeaderToHttpURLConnection(header, httpURLConnection);
 
             int responseCode = httpURLConnection.getResponseCode();
@@ -187,6 +207,8 @@ public class ApiClient {
             URL mURL = new URL(urlStr);
             httpURLConnection = (HttpURLConnection) mURL.openConnection();
             httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setConnectTimeout(request.connectionTimeout);
+            httpURLConnection.setReadTimeout(request.readTimeout);
             httpURLConnection.setDoOutput(true);
 
             addHeaderToHttpURLConnection(header, httpURLConnection);
@@ -255,7 +277,8 @@ public class ApiClient {
             URL uri = new URL(url);
 
             httpURLConnection = (HttpURLConnection) uri.openConnection();
-            httpURLConnection.setReadTimeout(5000);
+            httpURLConnection.setConnectTimeout(request.connectionTimeout);
+            httpURLConnection.setReadTimeout(request.readTimeout);
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setUseCaches(false);
             httpURLConnection.setRequestMethod("POST");

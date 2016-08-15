@@ -206,7 +206,7 @@ public class ApiClientTest {
         people.setHeight(1.73);
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
