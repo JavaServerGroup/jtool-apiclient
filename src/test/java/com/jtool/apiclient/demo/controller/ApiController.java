@@ -35,7 +35,6 @@ public class ApiController {
 
         log.debug(peopleRequest.toString());
 
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -64,6 +63,8 @@ public class ApiController {
         if(peopleRequest.getArticle() != null) {
             responsePeople.setArticle(Base64.getEncoder().encodeToString(peopleRequest.getArticle().getBytes()));
         }
+
+        responsePeople.setTels(peopleRequest.getTels());
 
         return JSON.toJSONString(responsePeople);
     }

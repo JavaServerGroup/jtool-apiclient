@@ -138,6 +138,12 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
 
+        List<String> tels = new ArrayList<String>();
+        tels.add("13800138000");
+        tels.add("13450363825");
+
+        people.setTels(tels);
+
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
@@ -145,6 +151,7 @@ public class ApiClientTest {
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
         Assert.assertNull(responsePeople.getAvatar());
+        Assert.assertEquals(tels, responsePeople.getTels());
     }
 
     @Test

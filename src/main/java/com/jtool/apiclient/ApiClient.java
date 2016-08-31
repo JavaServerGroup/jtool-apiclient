@@ -113,6 +113,7 @@ public class ApiClient {
             } else if(LogHelper.getLogId() != null){
                 header.put(LogHelper.JTOOL_LOG_ID, LogHelper.getLogId());
             }
+            LogHelper.setLogId(header.get(LogHelper.JTOOL_LOG_ID));
             this.header = header;
         }
 
@@ -418,19 +419,29 @@ public class ApiClient {
             for(Map.Entry<String, Object> entry : params.entrySet()){
                 String key = entry.getKey();
                 Object value = entry.getValue();
-                if(paramsString.length() > 0) {
-                    paramsString.append("&");
-                }
-                try {
-                    paramsString.append(URLEncoder.encode(key, "UTF-8"));
-                    paramsString.append("=");
-                    paramsString.append(URLEncoder.encode(value.toString(), "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                if(value instanceof List) {
+                    for(Object v : (List)value) {
+                        genParamsStrItem(paramsString, key, v);
+                    }
+                } else {
+                    genParamsStrItem(paramsString, key, value);
                 }
             }
         }
         return paramsString.toString();
+    }
+
+    private static void genParamsStrItem(StringBuffer paramsString, String key, Object value) {
+        if(paramsString.length() > 0) {
+            paramsString.append("&");
+        }
+        try {
+            paramsString.append(URLEncoder.encode(key, "UTF-8"));
+            paramsString.append("=");
+            paramsString.append(URLEncoder.encode(value.toString(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private static Map<String, Object> bean2Map(Object obj) {

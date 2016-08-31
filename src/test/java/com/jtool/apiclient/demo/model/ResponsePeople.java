@@ -11,6 +11,8 @@ public class ResponsePeople {
     private String article;
     private List<String> imgs;
 
+    private List<String> tels;
+
     public String getName() {
         return name;
     }
@@ -67,6 +69,14 @@ public class ResponsePeople {
         this.imgs = imgs;
     }
 
+    public List<String> getTels() {
+        return tels;
+    }
+
+    public void setTels(List<String> tels) {
+        this.tels = tels;
+    }
+
     @Override
     public String toString() {
         return "ResponsePeople{" +
@@ -77,6 +87,7 @@ public class ResponsePeople {
                 ", gallery='" + gallery + '\'' +
                 ", article='" + article + '\'' +
                 ", imgs=" + imgs +
+                ", tels=" + tels +
                 '}';
     }
 }

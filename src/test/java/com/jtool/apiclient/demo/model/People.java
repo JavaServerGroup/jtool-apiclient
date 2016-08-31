@@ -13,6 +13,8 @@ public class People {
     private File gallery;
     private File article;
 
+    private List<String> tels;
+
     public List<File> getImgs() {
         return imgs;
     }
@@ -69,6 +71,14 @@ public class People {
         this.article = article;
     }
 
+    public List<String> getTels() {
+        return tels;
+    }
+
+    public void setTels(List<String> tels) {
+        this.tels = tels;
+    }
+
     @Override
     public String toString() {
         return "People{" +
@@ -79,6 +89,7 @@ public class People {
                 ", avatar=" + avatar +
                 ", gallery=" + gallery +
                 ", article=" + article +
+                ", tels=" + tels +
                 '}';
     }
 }

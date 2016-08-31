@@ -13,6 +13,8 @@ public class PeopleRequest {
     private MultipartFile gallery;
     private MultipartFile article;
 
+    private List<String> tels;
+
     public List<MultipartFile> getImgs() {
         return imgs;
     }
@@ -69,6 +71,14 @@ public class PeopleRequest {
         this.article = article;
     }
 
+    public List<String> getTels() {
+        return tels;
+    }
+
+    public void setTels(List<String> tels) {
+        this.tels = tels;
+    }
+
     @Override
     public String toString() {
         return "PeopleRequest{" +
@@ -79,6 +89,7 @@ public class PeopleRequest {
                 ", avatar=" + avatar +
                 ", gallery=" + gallery +
                 ", article=" + article +
+                ", tels=" + tels +
                 '}';
     }
 }
