@@ -1,6 +1,7 @@
 package com.jtool.apiclient;
 
 import com.alibaba.fastjson.JSON;
+import com.jtool.apiclient.aes.AES256Cipher;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
 import com.jtool.support.log.LogHelper;
 import org.slf4j.Logger;
@@ -38,8 +39,18 @@ public class ApiClient {
         private boolean isRest;
         private int connectionTimeout = 30000;
         private int readTimeout = 30000;
+        private String encryptionKey = null;
+        private String encryptionIv = null;
+        private boolean isEncryption = false;
 
         private Request() {
+        }
+
+        public Request encryptionSeed(String encryptionIv, String encryptionKey) {
+            isEncryption = true;
+            this.encryptionKey = encryptionKey;
+            this.encryptionIv = encryptionIv;
+            return this;
         }
 
         public Request header(Map<String, String> header) {
@@ -110,7 +121,7 @@ public class ApiClient {
             Map<String, String> header = this.header == null ? new HashMap<String, String>() : this.header;
             if (this._logId != null && !"".equals(this._logId)) {
                 header.put(LogHelper.JTOOL_LOG_ID, this._logId);
-            } else if(LogHelper.getLogId() != null){
+            } else if (LogHelper.getLogId() != null) {
                 header.put(LogHelper.JTOOL_LOG_ID, LogHelper.getLogId());
             }
             LogHelper.setLogId(header.get(LogHelper.JTOOL_LOG_ID));
@@ -189,10 +200,14 @@ public class ApiClient {
         Map<String, Object> params = request.getParam();
 
         String paramsString;
-        if(request.isRest) {
+        if (request.isRest) {
             paramsString = JSON.toJSONString(params);
         } else {
             paramsString = params2paramsStr(params);
+        }
+
+        if (request.isEncryption) {
+            paramsString = AES256Cipher.encrypt(request.encryptionIv, request.encryptionKey, paramsString);
         }
 
         log.debug("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header, request.isRest) + " -X POST -d '" + paramsString + "'");
@@ -215,7 +230,7 @@ public class ApiClient {
             addHeaderToHttpURLConnection(header, httpURLConnection);
 
             if (!"".equals(paramsString)) {
-                if(request.isRest) {
+                if (request.isRest) {
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                 } else {
                     httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
@@ -292,14 +307,14 @@ public class ApiClient {
             try {
                 out = new BufferedOutputStream(httpURLConnection.getOutputStream());
 
-                for(Map.Entry<String, Object> entry : params.entrySet()) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
                     String key = entry.getKey();
                     Object param = entry.getValue();
                     if (param != null) {
 
-                        if(param instanceof List && ((List)param).size() > 0 && allListItemIsFile((List)param)) {
-                            for(Object file : ((List)param)) {
-                                genPostFile(key, (File)file, out, BOUNDARY);
+                        if (param instanceof List && ((List) param).size() > 0 && allListItemIsFile((List) param)) {
+                            for (Object file : ((List) param)) {
+                                genPostFile(key, (File) file, out, BOUNDARY);
                             }
                         } else if (param instanceof File) {
                             genPostFile(key, (File) param, out, BOUNDARY);
@@ -396,14 +411,14 @@ public class ApiClient {
             }
             return os.toString("UTF-8");
         } finally {
-            if(os != null) {
+            if (os != null) {
                 try {
                     os.close();
                 } catch (IOException e) {
                     os = null;
                 }
             }
-            if(is != null) {
+            if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
@@ -414,13 +429,13 @@ public class ApiClient {
 
     private static String params2paramsStr(Map<String, Object> params) {
         StringBuffer paramsString = new StringBuffer();
-        if(params != null && params.size() > 0) {
+        if (params != null && params.size() > 0) {
 
-            for(Map.Entry<String, Object> entry : params.entrySet()){
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
-                if(value instanceof List) {
-                    for(Object v : (List)value) {
+                if (value instanceof List) {
+                    for (Object v : (List) value) {
                         genParamsStrItem(paramsString, key, v);
                     }
                 } else {
@@ -432,7 +447,7 @@ public class ApiClient {
     }
 
     private static void genParamsStrItem(StringBuffer paramsString, String key, Object value) {
-        if(paramsString.length() > 0) {
+        if (paramsString.length() > 0) {
             paramsString.append("&");
         }
         try {
@@ -447,7 +462,7 @@ public class ApiClient {
     private static Map<String, Object> bean2Map(Object obj) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        if(obj == null){
+        if (obj == null) {
             return map;
         }
 
@@ -463,7 +478,7 @@ public class ApiClient {
                     Method getter = property.getReadMethod();
                     Object value = getter.invoke(obj);
 
-                    if(value != null) {
+                    if (value != null) {
                         map.put(key, value);
                     }
                 }
@@ -479,8 +494,8 @@ public class ApiClient {
     }
 
     private static void addHeaderToHttpURLConnection(Map<String, String> header, HttpURLConnection httpURLConnection) {
-        if(header != null) {
-            for(Map.Entry<String, String> entry : header.entrySet()) {
+        if (header != null) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
                 httpURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -489,13 +504,13 @@ public class ApiClient {
     private static boolean isPostFile(Map<String, Object> params) {
         boolean result = false;
 
-        if(params != null) {
-            for(Map.Entry<String, Object> entry : params.entrySet()) {
-                if(entry.getValue() instanceof File) {
+        if (params != null) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                if (entry.getValue() instanceof File) {
                     result = true;
                 }
-                if(entry.getValue() instanceof List && listItemHasFile((List)entry.getValue())) {
-                    if(allListItemIsFile((List)entry.getValue())) {
+                if (entry.getValue() instanceof List && listItemHasFile((List) entry.getValue())) {
+                    if (allListItemIsFile((List) entry.getValue())) {
                         result = true;
                     } else {
                         throw new RuntimeException("列表的项应该全为File");
@@ -507,13 +522,13 @@ public class ApiClient {
         return result;
     }
 
-    private static boolean listItemHasFile(List list){
+    private static boolean listItemHasFile(List list) {
 
         Iterator iterator = list.iterator();
 
         while (iterator.hasNext()) {
             Object obj = iterator.next();
-            if(obj instanceof File) {
+            if (obj instanceof File) {
                 return true;
             }
         }
@@ -521,13 +536,13 @@ public class ApiClient {
         return false;
     }
 
-    private static boolean allListItemIsFile(List list){
+    private static boolean allListItemIsFile(List list) {
 
         Iterator iterator = list.iterator();
 
         while (iterator.hasNext()) {
             Object obj = iterator.next();
-            if(!(obj instanceof File)) {
+            if (!(obj instanceof File)) {
                 return false;
             }
         }
@@ -536,11 +551,11 @@ public class ApiClient {
     }
 
     private static String makeHeaderLogString(Map<String, String> header, boolean isRest) {
-        if(header == null) {
+        if (header == null) {
             return "";
         } else {
             StringBuffer headerStr = new StringBuffer();
-            for(Map.Entry<String, String> entry : header.entrySet()) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
                 headerStr.append(" -H '");
                 headerStr.append(entry.getKey());
                 headerStr.append(": ");
@@ -548,7 +563,7 @@ public class ApiClient {
                 headerStr.append("' ");
             }
 
-            if(isRest) {
+            if (isRest) {
                 headerStr.append(" -H 'Content-Type:application/json' ");
             }
 
@@ -562,11 +577,11 @@ public class ApiClient {
 
     private static void logHttpURLConnectionErrorStream(HttpURLConnection httpURLConnection) {
         try {
-            if(httpURLConnection != null) {
+            if (httpURLConnection != null) {
                 String errorStream = readAndCloseStream(httpURLConnection.getErrorStream());
                 log.error("访问发生异常，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + errorStream);
             }
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -575,20 +590,33 @@ public class ApiClient {
 
         int index = filename.lastIndexOf(".");
 
-        if(index == -1) {
+        if (index == -1) {
             return "application/octet-stream";
         }
 
         String suffix = filename.substring(index);
 
-        if(".gif".equalsIgnoreCase(suffix)) {
+        if (".gif".equalsIgnoreCase(suffix)) {
             return "image/gif";
-        } else if(".jpg".equalsIgnoreCase(suffix) || ".jpeg".equalsIgnoreCase(suffix)){
+        } else if (".jpg".equalsIgnoreCase(suffix) || ".jpeg".equalsIgnoreCase(suffix)) {
             return "image/jpeg";
-        } else if(".png".equalsIgnoreCase(suffix)) {
+        } else if (".png".equalsIgnoreCase(suffix)) {
             return "image/png";
         } else {
             return "application/octet-stream";
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

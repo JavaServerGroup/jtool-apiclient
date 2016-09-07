@@ -1,6 +1,7 @@
 package com.jtool.apiclient.demo;
 
 import com.alibaba.fastjson.JSON;
+import com.jtool.apiclient.demo.controller.RestApiController;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
@@ -161,6 +162,20 @@ public class ApiClientTest {
         people.setHeight(1.73);
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
+        Assert.assertEquals(new Integer(30), responsePeople.getAge());
+        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
+        Assert.assertNull(responsePeople.getGallery());
+        Assert.assertNull(responsePeople.getArticle());
+        Assert.assertNull(responsePeople.getAvatar());
+    }
+
+    @Test
+    public void restPostWithUrlAndBeanParamTest2() throws Exception {
+        People people = new People();
+        people.setAge(30);
+        people.setHeight(1.73);
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).encryptionSeed(RestApiController.iv, RestApiController.key).restPost(host + "/restPost2?name=中文名"), ResponsePeople.class);
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
         Assert.assertNull(responsePeople.getGallery());
