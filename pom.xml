@@ -94,6 +94,11 @@
       <version>1.7.21</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.jtool</groupId>
+      <artifactId>jtool-support</artifactId>
+      <version>0.0.6</version>
+    </dependency>
   </dependencies>
 
   <repositories>

@@ -5,6 +5,7 @@ import com.jtool.apiclient.demo.controller.RestApiController;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
+import com.jtool.support.encrypt.EncryptPojo;
 import com.jtool.support.log.LogHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -12,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
@@ -175,7 +177,10 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).encryptionSeed(RestApiController.iv, RestApiController.key).restPost(host + "/restPost2?name=中文名"), ResponsePeople.class);
+        EncryptPojo encryptPojo = EncryptPojo.create();
+        RestApiController.encryptMap.put(encryptPojo.getEncryptId(), encryptPojo);
+
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).encryptionSeed(encryptPojo).restPost(host + "/restPost2?name=中文名"), ResponsePeople.class);
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
         Assert.assertNull(responsePeople.getGallery());

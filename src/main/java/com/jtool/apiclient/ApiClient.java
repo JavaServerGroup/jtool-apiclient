@@ -1,8 +1,9 @@
 package com.jtool.apiclient;
 
 import com.alibaba.fastjson.JSON;
-import com.jtool.apiclient.aes.AES256Cipher;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
+import com.jtool.support.encrypt.AES256Cipher;
+import com.jtool.support.encrypt.EncryptPojo;
 import com.jtool.support.log.LogHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +40,22 @@ public class ApiClient {
         private boolean isRest;
         private int connectionTimeout = 30000;
         private int readTimeout = 30000;
-        private String encryptionKey = null;
-        private String encryptionIv = null;
+        private EncryptPojo encryptPojo;
         private boolean isEncryption = false;
 
         private Request() {
         }
 
-        public Request encryptionSeed(String encryptionIv, String encryptionKey) {
+        public Request encryptionSeed(EncryptPojo encryptPojo) {
             isEncryption = true;
-            this.encryptionKey = encryptionKey;
-            this.encryptionIv = encryptionIv;
+            this.encryptPojo = encryptPojo;
+
+            if(this.header == null) {
+                this.header = new HashMap<String, String>();
+            }
+
+            this.header.put("encryptId", encryptPojo.getEncryptId());
+
             return this;
         }
 
@@ -207,7 +213,7 @@ public class ApiClient {
         }
 
         if (request.isEncryption) {
-            paramsString = AES256Cipher.encrypt(request.encryptionIv, request.encryptionKey, paramsString);
+            paramsString = AES256Cipher.encrypt(request.encryptPojo, paramsString);
         }
 
         log.debug("发送请求: curl '" + urlStr + "' " + makeHeaderLogString(header, request.isRest) + " -X POST -d '" + paramsString + "'");
