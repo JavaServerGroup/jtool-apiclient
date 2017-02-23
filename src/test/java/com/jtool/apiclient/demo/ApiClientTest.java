@@ -1,11 +1,9 @@
 package com.jtool.apiclient.demo;
 
 import com.alibaba.fastjson.JSON;
-import com.jtool.apiclient.demo.controller.RestApiController;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
-import com.jtool.support.encrypt.EncryptPojo;
 import com.jtool.support.log.LogHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -13,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
@@ -172,23 +169,6 @@ public class ApiClientTest {
     }
 
     @Test
-    public void restPostWithUrlAndBeanParamTest2() throws Exception {
-        People people = new People();
-        people.setAge(30);
-        people.setHeight(1.73);
-
-        EncryptPojo encryptPojo = EncryptPojo.create();
-        RestApiController.encryptMap.put(encryptPojo.getEncryptId(), encryptPojo);
-
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).encryptionSeed(encryptPojo).restPost(host + "/restPost2?name=中文名"), ResponsePeople.class);
-        Assert.assertEquals(new Integer(30), responsePeople.getAge());
-        Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
-        Assert.assertNull(responsePeople.getGallery());
-        Assert.assertNull(responsePeople.getArticle());
-        Assert.assertNull(responsePeople.getAvatar());
-    }
-
-    @Test
     public void postWithUrlAndBeanParamTestWithURLEncode() throws Exception {
         People people = new People();
         people.setName("1+1");
@@ -233,7 +213,7 @@ public class ApiClientTest {
         people.setHeight(1.73);
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -256,7 +236,7 @@ public class ApiClientTest {
 
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -281,7 +261,7 @@ public class ApiClientTest {
 
         params.put("imgs", images);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
 
         Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
@@ -294,7 +274,7 @@ public class ApiClientTest {
         People people = new People();
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost"), ResponsePeople.class);
         Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
@@ -309,7 +289,7 @@ public class ApiClientTest {
         people.setAvatar(new File("src/test/resources/media/g.gif"));
         people.setGallery(new File("src/test/resources/media/j.jpg"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -329,7 +309,7 @@ public class ApiClientTest {
         people.setGallery(new File("src/test/resources/media/j.jpg"));
         people.setArticle(new File("src/test/resources/media/myarticle.txt"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -367,11 +347,6 @@ public class ApiClientTest {
         Api().post("http://www");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testCallHeaderTwice() {
-        Api().header(new HashMap<String, String>()).header(new HashMap<String, String>());
-    }
-
     @Test
     public void testHeader() throws IOException {
         Map<String, String> header = new HashMap<String, String>();
@@ -386,15 +361,19 @@ public class ApiClientTest {
     }
 
     @Test
-    public void testSetLogId() throws IOException {
-        String uuid = UUID.randomUUID().toString();
-        Assert.assertEquals(uuid, Api().logId(uuid).get(host + "/forTestSetLogId"));
-    }
-
-    @Test
     public void testRedirect() throws IOException {
         Assert.assertEquals("ok", Api().get(host + "/forTestRedirect"));
     }
+
+
+
+
+//    @Test
+//    public void mytest() throws Exception {
+//        FileRequest fileRequest = new FileRequest();
+//        fileRequest.setTxtFile(new File("/Users/jialechan/temp/1111.txt"));
+//        System.out.println(Api().param(fileRequest).filePost("http://localhost:8080/upload"));
+//    }
 
 
 }

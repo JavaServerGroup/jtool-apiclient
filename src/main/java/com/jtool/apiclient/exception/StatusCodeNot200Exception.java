@@ -7,8 +7,6 @@ import java.util.Map;
 
 public class StatusCodeNot200Exception extends RuntimeException {
 
-	private static final long serialVersionUID = 2977215131256852771L;
-	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private String url;
