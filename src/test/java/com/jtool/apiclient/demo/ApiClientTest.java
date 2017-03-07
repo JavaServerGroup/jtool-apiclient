@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static com.jtool.apiclient.ApiClient.Api;
@@ -34,7 +35,7 @@ public class ApiClientTest {
     public void getTest() throws Exception {
         Assert.assertEquals("{}", Api().get(host + "/sentGet"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -75,8 +76,8 @@ public class ApiClientTest {
 
     @Test
     public void getTest3() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=中文&age=22&height=1.66"), ResponsePeople.class);
-        Assert.assertEquals("中文", responsePeople.getName());
+        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8") + "&age=22&height=1.66"), ResponsePeople.class);
+        Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(22), responsePeople.getAge());
         Assert.assertEquals(new Double(1.66), responsePeople.getHeight());
     }
@@ -113,7 +114,7 @@ public class ApiClientTest {
 
     @Test
     public void postWithUrlParamTest() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -124,7 +125,7 @@ public class ApiClientTest {
 
     @Test
     public void restPostWithUrlParamTest() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getHeight());
@@ -144,7 +145,7 @@ public class ApiClientTest {
 
         people.setTels(tels);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -160,7 +161,7 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
         Assert.assertNull(responsePeople.getGallery());
@@ -213,7 +214,7 @@ public class ApiClientTest {
         people.setHeight(1.73);
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -236,7 +237,7 @@ public class ApiClientTest {
 
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -261,7 +262,7 @@ public class ApiClientTest {
 
         params.put("imgs", images);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
 
         Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
@@ -289,7 +290,7 @@ public class ApiClientTest {
         people.setAvatar(new File("src/test/resources/media/g.gif"));
         people.setGallery(new File("src/test/resources/media/j.jpg"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=中文名"), ResponsePeople.class);
+        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
