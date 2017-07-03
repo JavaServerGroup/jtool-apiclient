@@ -41,7 +41,9 @@ public abstract class Processor {
             int responseCode = httpURLConnection.getResponseCode();
             if (responseCode == 200) {
                 try(InputStream is = httpURLConnection.getInputStream()) {
-                    return readAndCloseStream(is);
+                    final String result = readAndCloseStream(is);
+                    log.debug("返回: {}", result);
+                    return result;
                 }
             } else {
                 logHttpURLConnectionErrorStream(httpURLConnection);

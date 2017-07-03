@@ -11,9 +11,9 @@ public class StatusCodeNot200Exception extends RuntimeException {
 	
 	private String url;
 	private int statusCode;
-	private Map<String, Object> params;
+	private Object params;
 	
-	public StatusCodeNot200Exception(String url, Map<String, Object> params, int statusCode) {
+	public StatusCodeNot200Exception(String url, Object params, int statusCode) {
 		this.url = url;
 		this.params = params;
 		this.statusCode = statusCode;
@@ -28,7 +28,7 @@ public class StatusCodeNot200Exception extends RuntimeException {
 		return statusCode;
 	}
 
-	public Map<String, Object> getParams() {
+	public Object getParams() {
 		return params;
 	}
 

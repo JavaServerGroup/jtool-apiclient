@@ -12,12 +12,13 @@ import static com.jtool.apiclient.Util.obj2Map;
 public class Request {
 
     private Map<String, String> header = new HashMap<>();
-    private Map<String, Object> param;
+    private Object param;
     private String url;
     private boolean isRest;
     private int connectionTimeout = ApiClient.getConnectionTimeout();
     private int readTimeout = ApiClient.getReadTimeout();
     private String paramsString;
+    private boolean isWithClassName;
 
     protected Request() {
     }
@@ -25,8 +26,18 @@ public class Request {
     public String getParamsString() {
         return paramsString;
     }
+
     public void setParamsString(String paramsString) {
         this.paramsString = paramsString;
+    }
+
+    public boolean isWithClassName() {
+        return this.isWithClassName;
+    }
+
+    public Request isWithClassName(boolean isWithClassName) {
+        this.isWithClassName = isWithClassName;
+        return this;
     }
 
     public Request header(Map<String, String> header) {
@@ -60,9 +71,7 @@ public class Request {
         if (this.param != null) {
             throw new IllegalArgumentException("param方法应该只调用一次");
         }
-
-        this.param = obj2Map(param);
-
+        this.param = param;
         return this;
     }
 
@@ -102,7 +111,7 @@ public class Request {
         this.header = header;
     }
 
-    public Map<String, Object> getParam() {
+    public Object getParam() {
         return param;
     }
 

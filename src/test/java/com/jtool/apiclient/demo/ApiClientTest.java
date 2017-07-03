@@ -84,7 +84,7 @@ public class ApiClientTest {
 
     @Test
     public void getTest4() throws Exception {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("name", "map中文名");
         params.put("age", 31);
         params.put("height", 1.74);
@@ -327,7 +327,6 @@ public class ApiClientTest {
         } catch (StatusCodeNot200Exception e) {
             Assert.assertEquals(404, e.getStatusCode());
             Assert.assertEquals(url404, e.getUrl());
-            Assert.assertTrue(e.getParams() == null || e.getParams().size() == 0);
         }
     }
 

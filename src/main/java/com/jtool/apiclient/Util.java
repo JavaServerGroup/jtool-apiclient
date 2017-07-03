@@ -24,9 +24,21 @@ public class Util {
     private Util() {
     }
 
-    public static String params2paramsStr(Map<String, Object> params) {
+    public static String params2paramsStr(Object paramsObj) {
 
-        if (params != null && params.size() > 0) {
+        Map<String, Object> params;
+
+        if(paramsObj == null) {
+            return "";
+        } else {
+            if(paramsObj instanceof Map) {
+                params = (Map<String, Object>)paramsObj;
+            } else {
+                params = obj2Map(paramsObj);
+            }
+        }
+
+        if (params.size() > 0) {
 
             List<String> paramsStrItemList = new ArrayList<>();
 
@@ -46,7 +58,13 @@ public class Util {
     }
 
     private static List<String> genParamsStrItemList(String key, List list) {
+
         List<String> result = new ArrayList<>();
+
+        if(list == null || list.isEmpty()) {
+            return result;
+        }
+
         for (Object v : list) {
             result.add(genParamsStrItem(key, v));
         }
@@ -71,15 +89,19 @@ public class Util {
     }
 
     private static String genParamsStrItem(String key, Object value) {
-        StringBuilder paramsString = new StringBuilder();
-        try {
-            paramsString.append(URLEncoder.encode(key, getCharsetName()));
-            paramsString.append("=");
-            paramsString.append(URLEncoder.encode(value.toString(), getCharsetName()));
-        } catch (UnsupportedEncodingException e) {
-            log.error("不支持字符编码", e);
+        if(key == null || value == null) {
+            return "";
+        } else {
+            StringBuilder paramsString = new StringBuilder();
+            try {
+                paramsString.append(URLEncoder.encode(key, getCharsetName()));
+                paramsString.append("=");
+                paramsString.append(URLEncoder.encode(value.toString(), getCharsetName()));
+            } catch (UnsupportedEncodingException e) {
+                log.error("不支持字符编码", e);
+            }
+            return paramsString.toString();
         }
-        return paramsString.toString();
     }
 
     public static String makeHeaderLogString(Map<String, String> header) {
@@ -148,7 +170,7 @@ public class Util {
         }
     }
 
-    static Map<String, Object> obj2Map(Object obj) {
+    public static Map<String, Object> obj2Map(Object obj) {
         Map<String, Object> map = new HashMap<>();
 
         if (obj == null) {
