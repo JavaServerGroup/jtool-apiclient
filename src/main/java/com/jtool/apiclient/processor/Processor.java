@@ -39,7 +39,7 @@ public abstract class Processor {
 
         try {
             int responseCode = httpURLConnection.getResponseCode();
-            if (responseCode == 200) {
+            if (responseCode >= 200 && responseCode <= 299) {
                 try(InputStream is = httpURLConnection.getInputStream()) {
                     final String result = readAndCloseStream(is);
                     log.debug("返回: {}", result);

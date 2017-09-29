@@ -23,28 +23,40 @@ public class RestPostProcessor extends Processor {
 
     public RestPostProcessor(Request request) {
         this.request = request;
+        request.setRest(true);
     }
 
     @Override
     void processingParam() {
         checkIsNotPostFile(Util.obj2Map(request.getParam()));
-        if(request.isWithClassName()) {
-            request.setParamsString(JSON.toJSONString(request.getParam(), features));
-        } else {
-            request.setParamsString(JSON.toJSONString(request.getParam()));
+        if(request.getParam() != null) {
+            if(request.isWithClassName()) {
+                request.setParamsString(JSON.toJSONString(request.getParam(), features));
+            } else {
+                request.setParamsString(JSON.toJSONString(request.getParam()));
+            }
         }
         if(log.isDebugEnabled()) {
-            log.debug("发送请求: curl '" + request.getUrl() + "' " + makeHeaderLogString(request.getHeader(), request.isRest()) + " -X POST -d '" + request.getParamsString() + "'");
+            if(request.getParamsString() == null) {
+                log.debug("发送请求: curl '{}' {} -X POST",
+                        request.getUrl(),
+                        makeHeaderLogString(request.getHeader(), request.isRest()));
+            } else {
+                log.debug("发送请求: curl '{}' {} -X POST -d '{}'",
+                        request.getUrl(),
+                        makeHeaderLogString(request.getHeader(), request.isRest()),
+                        request.getParamsString());
+            }
+
+
         }
     }
 
     @Override
     HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException {
         httpURLConnection.setDoOutput(true);
-        if (!"".equals(request.getParamsString())) {
-
-            httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-
+        httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        if (request.getParamsString() != null) {
             byte[] data = request.getParamsString().getBytes("UTF-8");
             httpURLConnection.setFixedLengthStreamingMode(data.length);
 
