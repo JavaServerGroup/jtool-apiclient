@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import static com.jtool.apiclient.Util.*;
 
@@ -39,6 +41,7 @@ public abstract class Processor {
 
         try {
             int responseCode = httpURLConnection.getResponseCode();
+
             if (responseCode >= 200 && responseCode <= 299) {
                 try(InputStream is = httpURLConnection.getInputStream()) {
                     final String result = readAndCloseStream(is);

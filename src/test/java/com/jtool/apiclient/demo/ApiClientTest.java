@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
@@ -218,7 +219,7 @@ public class ApiClientTest {
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
     }
@@ -241,12 +242,12 @@ public class ApiClientTest {
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
 
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getImgs().get(0))), responsePeople.getImgs().get(0));
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getImgs().get(1))), responsePeople.getImgs().get(1));
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getImgs().get(0))), responsePeople.getImgs().get(0));
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getImgs().get(1))), responsePeople.getImgs().get(1));
     }
 
     @Test
@@ -265,8 +266,8 @@ public class ApiClientTest {
         ResponsePeople responsePeople = JSON.parseObject(Api().param(params).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
 
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file2)), responsePeople.getImgs().get(1));
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(file2)), responsePeople.getImgs().get(1));
     }
 
     @Test
@@ -276,7 +277,7 @@ public class ApiClientTest {
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
         ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost"), ResponsePeople.class);
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
     }
@@ -294,8 +295,8 @@ public class ApiClientTest {
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getGallery())), responsePeople.getGallery());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getGallery())), responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
     }
 
@@ -314,9 +315,9 @@ public class ApiClientTest {
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getGallery())), responsePeople.getGallery());
-        Assert.assertEquals(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(people.getArticle())), responsePeople.getArticle());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getGallery())), responsePeople.getGallery());
+        Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getArticle())), responsePeople.getArticle());
     }
 
     @Test
@@ -364,6 +365,20 @@ public class ApiClientTest {
     public void testRedirect() throws IOException {
         Assert.assertEquals("ok", Api().get(host + "/forTestRedirect"));
     }
+
+    @Test
+    public void testHead() throws IOException {
+        Map<String, List<String>> responseHeader = Api().head(host + "/forTestRedirect");
+        Assert.assertEquals("2", responseHeader.get("Content-Length").get(0));
+    }
+
+    @Test
+    public void testHead2() throws IOException {
+        Map<String, List<String>> responseHeader = Api().head("https://r1---sn-q0c7dn7l.googlevideo.com/videoplayback?id=o-AN5j0WnOXTwsBzxssBIMJTuREre2QfNr6DokLw8odzTB&gir=yes&ip=52.78.228.110&key=cms1&requiressl=yes&ei=GYLhWYT5L_mIqQH1n4fwCQ&lmt=1422183378456587&sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pl,ratebypass,requiressl,source&mime=video%2Fmp4&expire=1507972729&source=youtube&itag=18&pl=15&dur=278.616&clen=5327078&ipbits=0&ratebypass=yes&signature=8061DA3ACE508D1942A46EFC136CA21F9403786F.5CF5B0440B14E6669983EC4B1049CEB28B7DC7BC&redirect_counter=1&rm=sn-ogu6y7e&req_id=2f49b5e000aaa3ee&cms_redirect=yes&ipbypass=yes&mip=52.19.96.184&mm=31&mn=sn-q0c7dn7l&ms=au&mt=1507952143&mv=m");
+        Assert.assertEquals("5327078", responseHeader.get("Content-Length").get(0));
+    }
+
+
 
 
 

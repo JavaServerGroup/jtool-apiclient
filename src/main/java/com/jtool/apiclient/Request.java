@@ -5,6 +5,7 @@ import com.jtool.apiclient.processor.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.jtool.apiclient.Util.obj2Map;
@@ -101,6 +102,13 @@ public class Request {
         this.url = url;
         Processor processor = new MultipartPostProcessor(this);
         return processor.process();
+    }
+
+    public Map<String, List<String>> head(String url) throws IOException {
+        this.url = url;
+        Processor processor = new HeadProcessor(this);
+        processor.process();
+        return ((HeadProcessor)processor).getResponseHeader();
     }
 
     public Map<String, String> getHeader() {

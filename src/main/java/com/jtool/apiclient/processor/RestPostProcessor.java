@@ -47,8 +47,6 @@ public class RestPostProcessor extends Processor {
                         makeHeaderLogString(request.getHeader(), request.isRest()),
                         request.getParamsString());
             }
-
-
         }
     }
 
@@ -66,7 +64,6 @@ public class RestPostProcessor extends Processor {
         }
         return httpURLConnection;
     }
-
 
     private void checkIsNotPostFile(Map<String, Object> params) {
         if (params != null) {
@@ -86,6 +83,5 @@ public class RestPostProcessor extends Processor {
             }
         }
     }
-
 
 }

@@ -47,21 +47,21 @@ public class ApiController {
         responsePeople.setHeight(peopleRequest.getHeight());
 
         if(peopleRequest.getImgs() != null) {
-            List<String> imagesStr = new ArrayList<String>();
+            List<String> imagesStr = new ArrayList<>();
             for(MultipartFile multipartFile : peopleRequest.getImgs()) {
-                imagesStr.add(Base64.getEncoder().encodeToString(multipartFile.getBytes()));
+                imagesStr.add(org.apache.commons.codec.binary.Base64.encodeBase64String(multipartFile.getBytes()));
             }
             responsePeople.setImgs(imagesStr);
         }
 
         if(peopleRequest.getAvatar() != null) {
-            responsePeople.setAvatar(Base64.getEncoder().encodeToString(peopleRequest.getAvatar().getBytes()));
+            responsePeople.setAvatar(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getAvatar().getBytes()));
         }
         if(peopleRequest.getGallery() != null) {
-            responsePeople.setGallery(Base64.getEncoder().encodeToString(peopleRequest.getGallery().getBytes()));
+            responsePeople.setGallery(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getGallery().getBytes()));
         }
         if(peopleRequest.getArticle() != null) {
-            responsePeople.setArticle(Base64.getEncoder().encodeToString(peopleRequest.getArticle().getBytes()));
+            responsePeople.setArticle(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getArticle().getBytes()));
         }
 
         responsePeople.setTels(peopleRequest.getTels());
