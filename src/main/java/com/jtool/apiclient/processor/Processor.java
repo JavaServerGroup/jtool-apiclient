@@ -35,16 +35,20 @@ public abstract class Processor {
 
     abstract HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException;
 
-    private String loadResponseString(HttpURLConnection httpURLConnection) throws IOException {
+    private String loadResponseString(HttpURLConnection httpURLConnection, boolean loadResponseString) throws IOException {
 
         try {
             int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode >= 200 && responseCode <= 299) {
                 try(InputStream is = httpURLConnection.getInputStream()) {
-                    final String result = readAndCloseStream(is);
-                    log.debug("返回: {}", result);
-                    return result;
+                    if(loadResponseString) {
+                        final String result = readAndCloseStream(is);
+                        log.debug("返回: {}", result);
+                        return result;
+                    } else {
+                        return "";
+                    }
                 }
             } else {
                 logHttpURLConnectionErrorStream(httpURLConnection);
@@ -61,10 +65,14 @@ public abstract class Processor {
     }
 
     public String process() throws IOException{
+        return process(true);
+    }
+
+    public String process(boolean loadResponseString) throws IOException{
         processingParam();
         final HttpURLConnection httpURLConnection = commonPreProcess();
         doProcess(httpURLConnection);
-        return loadResponseString(httpURLConnection);
+        return loadResponseString(httpURLConnection, loadResponseString);
     }
 
 

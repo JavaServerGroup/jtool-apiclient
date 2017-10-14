@@ -107,7 +107,7 @@ public class Request {
     public Map<String, List<String>> head(String url) throws IOException {
         this.url = url;
         Processor processor = new HeadProcessor(this);
-        processor.process();
+        processor.process(false);
         return ((HeadProcessor)processor).getResponseHeader();
     }
 
