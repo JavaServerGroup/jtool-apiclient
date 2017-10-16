@@ -6,7 +6,7 @@
    
 简易基于http的api请求客户端。不依赖其他库直接使用HttpURLConnection，支持keepalives。支持map和pojo作为请求参数。支持设置header。默认支持jtool的_logId日志系统。
 
-#Quick start
+# Quick start
 1.添加jtool的github的repository
 ```xml
 <repositories>
@@ -34,14 +34,14 @@ Api().get("http://www.example.org");
 or
 Api().post("http://www.example.org");
 ```
-##方法介绍
-###header方法。当发送的请求需要带上header:
+## 方法介绍
+### header方法。当发送的请求需要带上header:
 ```java
 Map<String, String> header = new HashMap<String, String>();
 header.put("Authorization", "Basic xxx");
 Api().header(header).post("http://www.example.org");
 ```
-###param方法。当请求需要带上参数:   
+### param方法。当请求需要带上参数:   
 带pojo参数：
 ```java
 public class User{
@@ -67,11 +67,11 @@ uploadImgParam.put("img", new File("~/photo.jpg"));
 uploadImgParam.put("fileName", "myphoto");
 Api().param(uploadImgParam).post("http:/www.example.org");
 ```
-#关于jtool的_logId的说明
+# 关于jtool的_logId的说明
 get/post方法默认会添加一个_logId参数到你的header
 _logId参数来自于MDC,当需要别的线程发送又希望请求带上_logId, 可以手动设置_logId:
 ```java
 Api().logId("a_random_logId").get("http://www.example.org");
 ```
-#异常：StatusCodeNot200Exception
+# 异常：StatusCodeNot200Exception
 当请求返回的status code返回的码不在大于等于200，小于400的时候，会抛出一个自定义的运行时异常:StatusCodeNot200Exception
