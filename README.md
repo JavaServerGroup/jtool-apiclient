@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.jtool</groupId>
     <artifactId>jtool-apiclient</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.13</version>
 </dependency>
 ```
 2.添加import
@@ -67,11 +67,13 @@ uploadImgParam.put("img", new File("~/photo.jpg"));
 uploadImgParam.put("fileName", "myphoto");
 Api().param(uploadImgParam).post("http:/www.example.org");
 ```
-# 关于jtool的_logId的说明
-get/post方法默认会添加一个_logId参数到你的header
-_logId参数来自于MDC,当需要别的线程发送又希望请求带上_logId, 可以手动设置_logId:
+# REST post
+可以调用restPost直接发送rest风格的post请求
 ```java
-Api().logId("a_random_logId").get("http://www.example.org");
+User user = new User();
+user.setName("Andy");
+
+String result = Api().param(people).restPost("http://www.xxx.com/restpost");
 ```
 # 异常：StatusCodeNot200Exception
 当请求返回的status code返回的码不在大于等于200，小于400的时候，会抛出一个自定义的运行时异常:StatusCodeNot200Exception
