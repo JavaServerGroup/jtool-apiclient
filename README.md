@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/JavaServerGroup/jtool-apiclient/badge.svg?branch=master)](https://coveralls.io/github/JavaServerGroup/jtool-apiclient?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8ad8c94ccc7d4b3280c8ce9e6ccf8c5b)](https://www.codacy.com/app/jiale-chan/jtool-apiclient?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=JavaServerGroup/jtool-apiclient&amp;utm_campaign=Badge_Grade)   
    
-简易基于http的api请求客户端。不依赖其他库直接使用HttpURLConnection，支持keepalives。支持map和pojo作为请求参数。支持设置header。默认支持jtool的_logId日志系统。
+简易基于http的api请求客户端。直接使用HttpURLConnection，支持keepalives。支持map和pojo作为请求参数。支持设置header。默认支持jtool的_logId日志系统。
 
 # Quick start
 1.添加jtool的github的repository
