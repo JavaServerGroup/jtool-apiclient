@@ -372,23 +372,4 @@ public class ApiClientTest {
         Assert.assertEquals("2", responseHeader.get("Content-Length").get(0));
     }
 
-    @Test
-    public void testHead2() throws IOException {
-        Map<String, List<String>> responseHeader = Api().head("https://r1---sn-q0c7dn7l.googlevideo.com/videoplayback?id=o-AN5j0WnOXTwsBzxssBIMJTuREre2QfNr6DokLw8odzTB&gir=yes&ip=52.78.228.110&key=cms1&requiressl=yes&ei=GYLhWYT5L_mIqQH1n4fwCQ&lmt=1422183378456587&sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pl,ratebypass,requiressl,source&mime=video%2Fmp4&expire=1507972729&source=youtube&itag=18&pl=15&dur=278.616&clen=5327078&ipbits=0&ratebypass=yes&signature=8061DA3ACE508D1942A46EFC136CA21F9403786F.5CF5B0440B14E6669983EC4B1049CEB28B7DC7BC&redirect_counter=1&rm=sn-ogu6y7e&req_id=2f49b5e000aaa3ee&cms_redirect=yes&ipbypass=yes&mip=52.19.96.184&mm=31&mn=sn-q0c7dn7l&ms=au&mt=1507952143&mv=m");
-        Assert.assertEquals("5327078", responseHeader.get("Content-Length").get(0));
-    }
-
-
-
-
-
-
-//    @Test
-//    public void mytest() throws Exception {
-//        FileRequest fileRequest = new FileRequest();
-//        fileRequest.setTxtFile(new File("/Users/jialechan/temp/1111.txt"));
-//        System.out.println(Api().param(fileRequest).filePost("http://localhost:8080/upload"));
-//    }
-
-
 }
