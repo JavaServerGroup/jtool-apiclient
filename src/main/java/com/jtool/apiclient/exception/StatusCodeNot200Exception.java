@@ -3,15 +3,13 @@ package com.jtool.apiclient.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 public class StatusCodeNot200Exception extends RuntimeException {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	private String url;
-	private int statusCode;
-	private Object params;
+	private final String url;
+	private final int statusCode;
+	private final Object params;
 	
 	public StatusCodeNot200Exception(String url, Object params, int statusCode) {
 		this.url = url;

@@ -14,7 +14,7 @@ public class HeadProcessor extends Processor {
 
     private Map<String, List<String>> responseHeader;
 
-    public HeadProcessor(Request request) throws IOException {
+    public HeadProcessor(Request request) {
         this.request = request;
     }
 

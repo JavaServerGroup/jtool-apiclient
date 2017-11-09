@@ -35,12 +35,6 @@ public class ApiController {
 
         log.debug(peopleRequest.toString());
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         ResponsePeople responsePeople = new ResponsePeople();
         responsePeople.setName(peopleRequest.getName());
         responsePeople.setAge(peopleRequest.getAge());

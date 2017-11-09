@@ -6,6 +6,8 @@ public class ApiClient {
     private static int readTimeout = 30000;
     private static String charsetName = "UTF-8";
 
+    private ApiClient(){}
+
     public static Request Api() {
         return new Request();
     }

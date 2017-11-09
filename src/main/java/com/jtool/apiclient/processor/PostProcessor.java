@@ -11,14 +11,17 @@ import static com.jtool.apiclient.Util.writeAndCloseStream;
 
 public class PostProcessor extends Processor {
 
-    public PostProcessor(Request request) throws IOException {
+    public PostProcessor(Request request) {
         this.request = request;
     }
 
     @Override
     void processingParam() {
         request.setParamsString(params2paramsStr(request.getParam()));
-        log.debug("发送请求: curl '" + request.getUrl() + "' " + makeHeaderLogString(request.getHeader(), request.isRest()) + " -X POST -d '" + request.getParamsString() + "'");
+        if(log.isDebugEnabled()) {
+            log.debug("发送请求: curl '{}' {} -X POST -d '{}'", request.getUrl(), makeHeaderLogString(request.getHeader(), request.isRest()), request.getParamsString());
+        }
+
     }
 
     @Override

@@ -31,27 +31,36 @@ public class MultipartPostProcessor extends Processor {
 
         if(request.getParam() != null) {
 
-            Map<String, Object> param;
-            if(request.getParam() instanceof Map) {
-                param = (Map)request.getParam();
-            } else {
-                param = Util.obj2Map(request.getParam());
-            }
+            Map<String, Object> param = fixParamToMap();
 
             for (Map.Entry<String, Object> entry : param.entrySet()) {
                 if (entry.getValue() != null) {
-                    if(entry.getValue() instanceof File) {
-                        multipartItemList.add(genMultipartFileItem(entry.getKey(), (File)entry.getValue()));
-                    } else if(entry.getValue() instanceof List && !((List)entry.getValue()).isEmpty() && allListItemIsFile((List) entry.getValue())) {
-                        for (Object file : ((List) entry.getValue())) {
-                            multipartItemList.add(genMultipartFileItem(entry.getKey(), (File)file));
-                        }
-                    } else {
-                        multipartItemList.add(genMultipartTextItem(entry.getKey(), entry.getValue().toString()));
-                    }
+                    paramToMultipartItem(entry);
                 }
             }
         }
+    }
+
+    private void paramToMultipartItem(Map.Entry<String, Object> entry) {
+        if(entry.getValue() instanceof File) {
+            multipartItemList.add(genMultipartFileItem(entry.getKey(), (File)entry.getValue()));
+        } else if(entry.getValue() instanceof List && !((List)entry.getValue()).isEmpty() && allListItemIsFile((List) entry.getValue())) {
+            for (Object file : ((List) entry.getValue())) {
+                multipartItemList.add(genMultipartFileItem(entry.getKey(), (File)file));
+            }
+        } else {
+            multipartItemList.add(genMultipartTextItem(entry.getKey(), entry.getValue().toString()));
+        }
+    }
+
+    private Map<String, Object> fixParamToMap() {
+        Map<String, Object> param;
+        if(request.getParam() instanceof Map) {
+            param = (Map)request.getParam();
+        } else {
+            param = Util.obj2Map(request.getParam());
+        }
+        return param;
     }
 
     private MultipartItem genMultipartTextItem(String key, String value) {
@@ -72,18 +81,18 @@ public class MultipartPostProcessor extends Processor {
 
     @Override
     HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException {
-        String BOUNDARY = UUID.randomUUID().toString();
+        String boundaryStr = UUID.randomUUID().toString();
         httpURLConnection.setDoOutput(true);
         httpURLConnection.setUseCaches(false);
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setRequestProperty("Charset", CHARSET);
-        httpURLConnection.setRequestProperty("Content-Type", MULTIPART_FROM_DATA + ";boundary=" + BOUNDARY);
+        httpURLConnection.setRequestProperty("Content-Type", MULTIPART_FROM_DATA + ";boundary=" + boundaryStr);
 
         try (OutputStream outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream())) {
 
             for(MultipartItem multipartItem : multipartItemList) {
                 outputStream.write(PREFIX.getBytes(CHARSET));
-                outputStream.write(BOUNDARY.getBytes(CHARSET));
+                outputStream.write(boundaryStr.getBytes(CHARSET));
                 outputStream.write(LINE_END.getBytes(CHARSET));
                 outputStream.write(multipartItem.genContentDispositionStr().getBytes(CHARSET));
                 outputStream.write(multipartItem.genContentType().getBytes(CHARSET));
@@ -91,7 +100,7 @@ public class MultipartPostProcessor extends Processor {
                 multipartItem.genBody(outputStream);
                 outputStream.write(LINE_END.getBytes(CHARSET));
             }
-            outputStream.write((PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes(CHARSET));
+            outputStream.write((PREFIX + boundaryStr + PREFIX + LINE_END).getBytes(CHARSET));
             outputStream.flush();
         }
 

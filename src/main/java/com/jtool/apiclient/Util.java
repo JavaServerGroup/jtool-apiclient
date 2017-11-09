@@ -1,5 +1,6 @@
 package com.jtool.apiclient;
 
+import com.jtool.apiclient.exception.Pojo2MapException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +204,7 @@ public class Util {
             }
         } catch (Exception e) {
             log.error("将bean转化为map时发生错误：" + obj, e);
-            throw new RuntimeException(e);
+            throw new Pojo2MapException(e);
         }
 
         return map;

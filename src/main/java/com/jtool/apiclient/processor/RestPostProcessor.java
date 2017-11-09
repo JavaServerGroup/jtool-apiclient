@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jtool.apiclient.Request;
 import com.jtool.apiclient.Util;
+import com.jtool.apiclient.exception.RestPostNotSupportFileException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -68,17 +68,20 @@ public class RestPostProcessor extends Processor {
     private void checkIsNotPostFile(Map<String, Object> params) {
         if (params != null) {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                if (entry.getValue() instanceof File) {
-                    throw new RuntimeException("rest post方式不支持发送文件");
-                }
-                if (entry.getValue() instanceof List) {
-                    Iterator iterator = ((List)entry.getValue()).iterator();
-                    while (iterator.hasNext()) {
-                        Object obj = iterator.next();
-                        if (obj instanceof File) {
-                            new RuntimeException("rest post方式不支持发送文件");
-                        }
-                    }
+                checkIsNotPostFileByEntry(entry);
+            }
+        }
+    }
+
+    private void checkIsNotPostFileByEntry(Map.Entry<String, Object> entry) {
+        if (entry.getValue() instanceof File) {
+            throw new RestPostNotSupportFileException();
+        }
+        if (entry.getValue() instanceof List) {
+
+            for(Object obj : (List)entry.getValue()) {
+                if (obj instanceof File) {
+                    throw new RestPostNotSupportFileException();
                 }
             }
         }
