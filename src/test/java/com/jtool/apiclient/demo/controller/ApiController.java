@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 @Controller
 public class ApiController {
@@ -105,6 +109,32 @@ public class ApiController {
     @RequestMapping(value = "/forTestRedirect2", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public String forTestRedirect2(People people) {
         return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getGzip", method = RequestMethod.GET)
+    public void getGzip(HttpServletResponse response) throws IOException {
+
+        response.setHeader("Content-Encoding", "gzip");
+
+        String str = "get Gzip controller";
+
+        response.getOutputStream().write(zip(str));
+    }
+
+    public byte[] zip(final String str) {
+        if ((str == null) || (str.length() == 0)) {
+            throw new IllegalArgumentException("Cannot zip null or empty string");
+        }
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+                gzipOutputStream.write(str.getBytes(StandardCharsets.UTF_8));
+            }
+            return byteArrayOutputStream.toByteArray();
+        } catch(IOException e) {
+            throw new RuntimeException("Failed to zip content", e);
+        }
     }
 
 }

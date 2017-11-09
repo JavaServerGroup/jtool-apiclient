@@ -372,4 +372,10 @@ public class ApiClientTest {
         Assert.assertEquals("2", responseHeader.get("Content-Length").get(0));
     }
 
+    @Test
+    public void testZip() throws IOException {
+        Assert.assertEquals("get Gzip controller", Api().get(host + "/getGzip"));
+        Assert.assertEquals("get Gzip controller", Api().gzipResponse().get(host + "/getGzip"));
+    }
+
 }

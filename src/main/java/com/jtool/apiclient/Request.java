@@ -20,6 +20,7 @@ public class Request {
     private int readTimeout = ApiClient.getReadTimeout();
     private String paramsString;
     private boolean isWithClassName;
+    private boolean isGzipResponse = false;
 
     protected Request() {
     }
@@ -73,6 +74,11 @@ public class Request {
             throw new IllegalArgumentException("param方法应该只调用一次");
         }
         this.param = param;
+        return this;
+    }
+
+    public Request gzipResponse() {
+        this.isGzipResponse = true;
         return this;
     }
 
@@ -149,5 +155,9 @@ public class Request {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isGzipResponse() {
+        return isGzipResponse;
     }
 }

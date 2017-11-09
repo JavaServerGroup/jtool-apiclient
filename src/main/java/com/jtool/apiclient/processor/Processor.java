@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 import static com.jtool.apiclient.Util.*;
 
@@ -28,6 +29,10 @@ public abstract class Processor {
 
         addHeaderToHttpURLConnection(request.getHeader(), httpURLConnection);
 
+        if(request.isGzipResponse()) {
+            httpURLConnection.setRequestProperty("Accept-Encoding", "gzip");
+        }
+
         return httpURLConnection;
     }
 
@@ -41,7 +46,8 @@ public abstract class Processor {
             int responseCode = httpURLConnection.getResponseCode();
 
             if (responseCode >= 200 && responseCode <= 299) {
-                try(InputStream is = httpURLConnection.getInputStream()) {
+
+                try(InputStream is = getInputStreamByConnection(httpURLConnection)) {
                     if(loadResponseString) {
                         final String result = readAndCloseStream(is);
                         log.debug("返回: {}", result);
@@ -61,6 +67,14 @@ public abstract class Processor {
             throw e;
         } finally {
             httpURLConnection.disconnect();
+        }
+    }
+
+    private InputStream getInputStreamByConnection(HttpURLConnection httpURLConnection) throws IOException {
+        if ("gzip".equals(httpURLConnection.getContentEncoding())) {
+            return new GZIPInputStream(httpURLConnection.getInputStream());
+        } else {
+            return httpURLConnection.getInputStream();
         }
     }
 
