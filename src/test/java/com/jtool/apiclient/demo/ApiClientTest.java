@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
+import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.support.log.LogHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -376,6 +377,40 @@ public class ApiClientTest {
     public void testZip() throws IOException {
         Assert.assertEquals("get Gzip controller", Api().get(host + "/getGzip"));
         Assert.assertEquals("get Gzip controller", Api().gzipResponse().get(host + "/getGzip"));
+    }
+    
+    @Test
+    public void testResponseWrapper1() throws Exception{
+    	ResponseWrapper a = Api().getResponseWrapper("http://dataservice.accuweather.com/locations/v1/regions?"
+    			+ "apikey=sEhJnp31vs45tXZCA0mNIG3YTE8EUCGj&language=en-us");
+    	
+    	Assert.assertEquals(200,a.getResponseCode());
+    	Assert.assertNotNull(a.getResponseBody());
+    	Assert.assertNotNull(a.getResponseHeader());
+    	System.out.println(a.getResponseHeader());
+    }
+    
+    @Test
+    public void testResponseWrapper() throws Exception{
+    	People people = new People();
+        people.setName("1+1");
+    	ResponsePeople responsePeople = JSON.parseObject(Api().param(people).getResponseWrapper(host + "/sentGet").getResponseBody(), ResponsePeople.class);
+    	Assert.assertEquals("1+1", responsePeople.getName());
+    	Assert.assertNull(responsePeople.getAge());
+    	Assert.assertNull(responsePeople.getGallery());
+    	Assert.assertNull(responsePeople.getHeight());
+    	Assert.assertNull(responsePeople.getArticle());
+    	Assert.assertNull(responsePeople.getAvatar());
+    }
+    
+    @Test(expected = IOException.class)
+    public void getResponseWrapperException() throws Exception {
+        Api().getResponseWrapper("http://www");
+    }
+    
+    @Test(expected = StatusCodeNot200Exception.class)
+    public void getResponseWrapperGet404() throws Exception {
+        Api().get(host + "/404");
     }
 
 }

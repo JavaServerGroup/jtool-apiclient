@@ -2,6 +2,8 @@ package com.jtool.apiclient.processor;
 
 import com.jtool.apiclient.Request;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
+import com.jtool.apiclient.model.ResponseWrapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,24 +45,16 @@ public abstract class Processor {
     private String loadResponseString(HttpURLConnection httpURLConnection, boolean loadResponseString) throws IOException {
 
         try {
-            int responseCode = httpURLConnection.getResponseCode();
+        	int responseCode = httpURLConnection.getResponseCode();
 
-            if (responseCode >= 200 && responseCode <= 299) {
+			if (responseCode >= 200 && responseCode <= 299) {
+				return handleResponseString(httpURLConnection, loadResponseString);
+			} else {
+				logHttpURLConnectionErrorStream(httpURLConnection);
+				throw new StatusCodeNot200Exception(request.getUrl(), request.getParam(), responseCode);
+			}
 
-                try(InputStream is = getInputStreamByConnection(httpURLConnection)) {
-                    if(loadResponseString) {
-                        final String result = readAndCloseStream(is);
-                        log.debug("返回: {}", result);
-                        return result;
-                    } else {
-                        return "";
-                    }
-                }
-            } else {
-                logHttpURLConnectionErrorStream(httpURLConnection);
-                throw new StatusCodeNot200Exception(request.getUrl(), request.getParam(), responseCode);
-            }
-
+            
         } catch (IOException e) {
             logHttpURLConnectionErrorStream(httpURLConnection);
             log.error("请求返回时发生IOException", e);
@@ -83,11 +77,88 @@ public abstract class Processor {
     }
 
     public String process(boolean loadResponseString) throws IOException{
-        processingParam();
-        final HttpURLConnection httpURLConnection = commonPreProcess();
-        doProcess(httpURLConnection);
-        return loadResponseString(httpURLConnection, loadResponseString);
+		final HttpURLConnection httpURLConnection = preprocess();
+		return loadResponseString(httpURLConnection, loadResponseString);
     }
+    
+    /**
+     * 处理responseBody输入流
+     * 
+     * @param httpURLConnection
+     * @param loadResponseString
+     * @return
+     * @throws IOException
+     */
+    private String handleResponseString(HttpURLConnection httpURLConnection, boolean loadResponseString)
+			throws IOException {
+		try (InputStream is = getInputStreamByConnection(httpURLConnection)) {
+			if (loadResponseString) {
+				
+				final String result = readAndCloseStream(is);
+				log.debug("返回: {}", result);
+				return result;
+			} else {
+				return "";
+			}
+		}
+	}
+    
+    /**
+     * 处理response获取wrapper
+     * 
+     * @param httpURLConnection
+     * @param loadResponseString
+     * @return
+     * @throws IOException
+     */
+    private ResponseWrapper loadResponseWrapper(HttpURLConnection httpURLConnection, boolean loadResponseString)
+			throws IOException {
+		ResponseWrapper wrapper = new ResponseWrapper();
+		try {
+			int responseCode = httpURLConnection.getResponseCode();
+			wrapper.setResponseCode(responseCode);
+			wrapper.setResponseHeader(httpURLConnection.getHeaderFields());
+
+			if (responseCode >= 200 && responseCode <= 299) {
+				wrapper.setResponseBody(handleResponseString(httpURLConnection, loadResponseString));
+				return wrapper;
+			} else {
+				logHttpURLConnectionErrorStream(httpURLConnection);
+				throw new StatusCodeNot200Exception(request.getUrl(), request.getParam(), responseCode);
+			}
+
+		} catch (IOException e) {
+			logHttpURLConnectionErrorStream(httpURLConnection);
+			log.error("请求返回时发生IOException", e);
+			throw e;
+		} finally {
+			httpURLConnection.disconnect();
+		}
+	}
+    
+	/**
+	 * 扩展处理
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public ResponseWrapper processExt() throws IOException {
+		final HttpURLConnection httpURLConnection = preprocess();
+		return loadResponseWrapper(httpURLConnection, true);
+	}
+    
+    /**
+	 * 预处理
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	private HttpURLConnection preprocess() throws IOException {
+		processingParam();
+		final HttpURLConnection httpURLConnection = commonPreProcess();
+		doProcess(httpURLConnection);
+		return httpURLConnection;
+	}
 
 
 }

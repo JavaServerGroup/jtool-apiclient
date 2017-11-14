@@ -1,6 +1,7 @@
 package com.jtool.apiclient;
 
 import com.jtool.apiclient.model.ParamMap;
+import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.apiclient.processor.*;
 
 import java.io.IOException;
@@ -160,4 +161,14 @@ public class Request {
     public boolean isGzipResponse() {
         return isGzipResponse;
     }
+    
+    /**
+     * 增加wrapper返回
+     */
+	public ResponseWrapper getResponseWrapper(String url) throws IOException {
+		this.url = url;
+		Processor processor = new GetProcessor(this);
+		
+		return processor.processExt();
+	}
 }
