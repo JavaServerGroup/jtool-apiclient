@@ -24,7 +24,7 @@ import static com.jtool.apiclient.ApiClient.Api;
 @SpringBootApplication
 public class ApiClientTest {
 
-    private final String host = "http://localhost:8082";
+    private final String host = "http://localhost:8080";
 
     @BeforeClass
     public static void setup() {
