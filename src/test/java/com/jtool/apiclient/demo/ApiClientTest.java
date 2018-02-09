@@ -37,7 +37,7 @@ public class ApiClientTest {
     public void getTest() throws Exception {
         Assert.assertEquals("{}", Api().get(host + "/sentGet"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -51,7 +51,7 @@ public class ApiClientTest {
         People people = new People();
         people.setName("1+1");
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).get(host + "/sentGet"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).get(host + "/sentGet", ResponsePeople.class);
         Assert.assertEquals("1+1", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -67,7 +67,7 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).get(host + "/sentGet"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).get(host + "/sentGet", ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -78,7 +78,7 @@ public class ApiClientTest {
 
     @Test
     public void getTest3() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8") + "&age=22&height=1.66"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8") + "&age=22&height=1.66", ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(22), responsePeople.getAge());
         Assert.assertEquals(new Double(1.66), responsePeople.getHeight());
@@ -91,7 +91,7 @@ public class ApiClientTest {
         params.put("age", 31);
         params.put("height", 1.74);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).get(host + "/sentGet"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(params).get(host + "/sentGet", ResponsePeople.class);
         Assert.assertEquals("map中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(31), responsePeople.getAge());
         Assert.assertEquals(new Double(1.74), responsePeople.getHeight());
@@ -116,7 +116,7 @@ public class ApiClientTest {
 
     @Test
     public void postWithUrlParamTest() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -127,7 +127,7 @@ public class ApiClientTest {
 
     @Test
     public void restPostWithUrlParamTest() throws Exception {
-        ResponsePeople responsePeople = JSON.parseObject(Api().restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getHeight());
@@ -147,7 +147,7 @@ public class ApiClientTest {
 
         people.setTels(tels);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).post(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -163,7 +163,7 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).restPost(host + "/restPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
         Assert.assertNull(responsePeople.getGallery());
@@ -176,7 +176,7 @@ public class ApiClientTest {
         People people = new People();
         people.setName("1+1");
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).post(host + "/sentPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).post(host + "/sentPost", ResponsePeople.class);
         Assert.assertEquals("1+1", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -190,7 +190,7 @@ public class ApiClientTest {
         People people = new People();
         people.setName("中文名");
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).restPost(host + "/restPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).restPost(host + "/restPost", ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
@@ -205,7 +205,7 @@ public class ApiClientTest {
         people.setAge(30);
         people.setHeight(1.73);
         people.setAvatar(new File("src/test/resources/media/g.gif"));
-        JSON.parseObject(Api().param(people).restPost(host + "/restPost?name=中文名"), ResponsePeople.class);
+        Api().param(people).restPost(host + "/restPost?name=中文名", ResponsePeople.class);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class ApiClientTest {
         people.setHeight(1.73);
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).setReadTimeout(10000).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).setReadTimeout(10000).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -239,7 +239,7 @@ public class ApiClientTest {
 
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -264,7 +264,7 @@ public class ApiClientTest {
 
         params.put("imgs", images);
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(params).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(params).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
 
         Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(file1)), responsePeople.getImgs().get(0));
@@ -277,7 +277,7 @@ public class ApiClientTest {
         People people = new People();
         people.setAvatar(new File("src/test/resources/media/g.gif"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).filePost(host + "/sentPost", ResponsePeople.class);
         Assert.assertEquals(Base64.encodeBase64String(FileUtils.readFileToByteArray(people.getAvatar())), responsePeople.getAvatar());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getArticle());
@@ -292,7 +292,7 @@ public class ApiClientTest {
         people.setAvatar(new File("src/test/resources/media/g.gif"));
         people.setGallery(new File("src/test/resources/media/j.jpg"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8")), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).filePost(host + "/sentPost?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -312,7 +312,7 @@ public class ApiClientTest {
         people.setGallery(new File("src/test/resources/media/j.jpg"));
         people.setArticle(new File("src/test/resources/media/myarticle.txt"));
 
-        ResponsePeople responsePeople = JSON.parseObject(Api().param(people).filePost(host + "/sentPost"), ResponsePeople.class);
+        ResponsePeople responsePeople = Api().param(people).filePost(host + "/sentPost", ResponsePeople.class);
         Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertEquals(new Integer(30), responsePeople.getAge());
         Assert.assertEquals(new Double(1.73), responsePeople.getHeight());
@@ -354,7 +354,7 @@ public class ApiClientTest {
         Map<String, String> header = new HashMap<String, String>();
         header.put("myHeader1", "myHeader1");
         header.put("myHeader2", "myHeader2");
-        Assert.assertEquals(header, JSON.parseObject(Api().header(header).get(host + "/sentGetWithHeader"), HashMap.class));
+        Assert.assertEquals(header, Api().header(header).get(host + "/sentGetWithHeader", HashMap.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -394,7 +394,7 @@ public class ApiClientTest {
     public void testResponseWrapper() throws Exception{
     	People people = new People();
         people.setName("1+1");
-    	ResponsePeople responsePeople = JSON.parseObject(Api().param(people).getResponseWrapper(host + "/sentGet").getResponseBody(), ResponsePeople.class);
+    	ResponsePeople responsePeople = Api().param(people).getResponseWrapper(host + "/sentGet").getResponseBody(ResponsePeople.class);
     	Assert.assertEquals("1+1", responsePeople.getName());
     	Assert.assertNull(responsePeople.getAge());
     	Assert.assertNull(responsePeople.getGallery());

@@ -1,5 +1,7 @@
 package com.jtool.apiclient.model;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,10 @@ public class ResponseWrapper {
 
 	public String getResponseBody() {
 		return responseBody;
+	}
+
+	public <T> T getResponseBody(Class<T> clazz) {
+		return JSON.parseObject(responseBody, clazz);
 	}
 
 	public void setResponseBody(String responseBody) {

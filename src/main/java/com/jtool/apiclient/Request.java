@@ -1,5 +1,6 @@
 package com.jtool.apiclient;
 
+import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.model.ParamMap;
 import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.apiclient.processor.*;
@@ -93,10 +94,18 @@ public class Request {
         return processor.process();
     }
 
+    public <T> T get(String url, Class<T> clazz) throws IOException {
+        return JSON.parseObject(get(url), clazz);
+    }
+
     public String post(String url) throws IOException {
         this.url = url;
         Processor processor = new PostProcessor(this);
         return processor.process();
+    }
+
+    public <T> T post(String url, Class<T> clazz) throws IOException {
+        return JSON.parseObject(post(url), clazz);
     }
 
     public String restPost(String url) throws IOException {
@@ -105,10 +114,18 @@ public class Request {
         return processor.process();
     }
 
+    public <T> T restPost(String url, Class<T> clazz) throws IOException {
+        return JSON.parseObject(restPost(url), clazz);
+    }
+
     public String filePost(String url) throws IOException {
         this.url = url;
         Processor processor = new MultipartPostProcessor(this);
         return processor.process();
+    }
+
+    public <T> T filePost(String url, Class<T> clazz) throws IOException {
+        return JSON.parseObject(filePost(url), clazz);
     }
 
     public Map<String, List<String>> head(String url) throws IOException {

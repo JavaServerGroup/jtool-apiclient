@@ -4,14 +4,14 @@
     <groupId>com.jtool</groupId>
     <artifactId>jtool-apiclient</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.15</version>
+    <version>0.0.16</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <slf4j-api.version>1.7.21</slf4j-api.version>
-        <fastjson.version>1.2.12</fastjson.version>
+        <fastjson.version>1.2.46</fastjson.version>
     </properties>
 
     <build>
