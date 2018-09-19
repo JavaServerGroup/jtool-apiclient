@@ -3,7 +3,6 @@ package com.jtool.apiclient.processor;
 import com.jtool.apiclient.Request;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
 import com.jtool.apiclient.model.ResponseWrapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,13 +71,15 @@ public abstract class Processor {
         }
     }
 
-    public String process() throws IOException{
+    public ResponseWrapper process() throws IOException{
         return process(true);
     }
 
-    public String process(boolean loadResponseString) throws IOException{
-		final HttpURLConnection httpURLConnection = preprocess();
-		return loadResponseString(httpURLConnection, loadResponseString);
+    public ResponseWrapper process(boolean loadResponseString) throws IOException{
+		processingParam();
+		final HttpURLConnection httpURLConnection = commonPreProcess();
+		doProcess(httpURLConnection);
+		return loadResponseWrapper(httpURLConnection, loadResponseString);
     }
     
     /**
@@ -134,30 +135,6 @@ public abstract class Processor {
 		} finally {
 			httpURLConnection.disconnect();
 		}
-	}
-    
-	/**
-	 * 扩展处理
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	public ResponseWrapper processExt() throws IOException {
-		final HttpURLConnection httpURLConnection = preprocess();
-		return loadResponseWrapper(httpURLConnection, true);
-	}
-    
-    /**
-	 * 预处理
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	private HttpURLConnection preprocess() throws IOException {
-		processingParam();
-		final HttpURLConnection httpURLConnection = commonPreProcess();
-		doProcess(httpURLConnection);
-		return httpURLConnection;
 	}
 
 

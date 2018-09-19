@@ -1,6 +1,5 @@
 package com.jtool.apiclient;
 
-import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.model.ParamMap;
 import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.apiclient.processor.*;
@@ -9,8 +8,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.jtool.apiclient.Util.obj2Map;
 
 public class Request {
 
@@ -90,42 +87,38 @@ public class Request {
 
     public String get(String url) throws IOException {
         this.url = url;
-        Processor processor = new GetProcessor(this);
-        return processor.process();
+        return getResponseWrapper(url).getResponseBody();
     }
 
     public <T> T get(String url, Class<T> clazz) throws IOException {
-        return JSON.parseObject(get(url), clazz);
+        return getResponseWrapper(url).getResponseBody(clazz);
     }
 
     public String post(String url) throws IOException {
         this.url = url;
-        Processor processor = new PostProcessor(this);
-        return processor.process();
+        return postResponseWrapper(url).getResponseBody();
     }
 
     public <T> T post(String url, Class<T> clazz) throws IOException {
-        return JSON.parseObject(post(url), clazz);
+        return postResponseWrapper(url).getResponseBody(clazz);
     }
 
     public String restPost(String url) throws IOException {
         this.url = url;
-        Processor processor = new RestPostProcessor(this);
-        return processor.process();
+        return restPostResponseWrapper(url).getResponseBody();
     }
 
     public <T> T restPost(String url, Class<T> clazz) throws IOException {
-        return JSON.parseObject(restPost(url), clazz);
+        return restPostResponseWrapper(url).getResponseBody(clazz);
     }
 
     public String filePost(String url) throws IOException {
         this.url = url;
-        Processor processor = new MultipartPostProcessor(this);
-        return processor.process();
+        return filePostResponseWrapper(url).getResponseBody();
     }
 
     public <T> T filePost(String url, Class<T> clazz) throws IOException {
-        return JSON.parseObject(filePost(url), clazz);
+        return filePostResponseWrapper(url).getResponseBody(clazz);
     }
 
     public Map<String, List<String>> head(String url) throws IOException {
@@ -184,8 +177,25 @@ public class Request {
      */
 	public ResponseWrapper getResponseWrapper(String url) throws IOException {
 		this.url = url;
-		Processor processor = new GetProcessor(this);
-		
-		return processor.processExt();
+		return new GetProcessor(this).process();
 	}
+
+    public ResponseWrapper postResponseWrapper(String url) throws IOException {
+        this.url = url;
+        Processor processor = new PostProcessor(this);
+        return processor.process();
+    }
+
+    public ResponseWrapper restPostResponseWrapper(String url) throws IOException {
+        this.url = url;
+        Processor processor = new RestPostProcessor(this);
+        return processor.process();
+    }
+
+    public ResponseWrapper filePostResponseWrapper(String url) throws IOException {
+        this.url = url;
+        Processor processor = new MultipartPostProcessor(this);
+        return processor.process();
+    }
+
 }
