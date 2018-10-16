@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 @Controller
@@ -135,6 +138,11 @@ public class ApiController {
         } catch(IOException e) {
             throw new RuntimeException("Failed to zip content", e);
         }
+    }
+
+    @RequestMapping(value = "/redirect", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public String redirect() {
+        return "redirect:http://www.baidu.com";
     }
 
 }

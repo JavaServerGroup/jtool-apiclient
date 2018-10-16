@@ -1,18 +1,17 @@
 package com.jtool.apiclient.demo;
 
-import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.demo.model.People;
 import com.jtool.apiclient.demo.model.ResponsePeople;
 import com.jtool.apiclient.exception.StatusCodeNot200Exception;
 import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.support.log.LogHelper;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
@@ -411,6 +410,16 @@ public class ApiClientTest {
     @Test(expected = StatusCodeNot200Exception.class)
     public void getResponseWrapperGet404() throws Exception {
         Api().get(host + "/404");
+    }
+
+    @Test()
+    public void redirect() throws Exception {
+        ResponseWrapper responseWrapper = Api().getResponseWrapper(host + "/redirect");
+        Assert.assertEquals(200, responseWrapper.getResponseCode());
+
+        responseWrapper = Api().setFollowRedirects(false).getResponseWrapper(host + "/redirect");
+        Assert.assertEquals(302, responseWrapper.getResponseCode());
+        Assert.assertEquals("http://www.baidu.com", responseWrapper.getResponseHeader().get("Location").get(0));
     }
 
 }

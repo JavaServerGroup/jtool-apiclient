@@ -20,6 +20,7 @@ public class Request {
     private String paramsString;
     private boolean isWithClassName;
     private boolean isGzipResponse = false;
+    private boolean isFollowRedirects = true;
 
     protected Request() {
     }
@@ -171,7 +172,16 @@ public class Request {
     public boolean isGzipResponse() {
         return isGzipResponse;
     }
-    
+
+    public boolean isFollowRedirects() {
+        return isFollowRedirects;
+    }
+
+    public Request setFollowRedirects(boolean followRedirects) {
+        isFollowRedirects = followRedirects;
+        return this;
+    }
+
     /**
      * 增加wrapper返回
      */

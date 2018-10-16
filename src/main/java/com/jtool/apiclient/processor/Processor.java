@@ -27,6 +27,7 @@ public abstract class Processor {
         httpURLConnection.setRequestProperty("Charset", "UTF-8");
         httpURLConnection.setConnectTimeout(request.getConnectionTimeout());
         httpURLConnection.setReadTimeout(request.getReadTimeout());
+        httpURLConnection.setInstanceFollowRedirects(request.isFollowRedirects());
 
         addHeaderToHttpURLConnection(request.getHeader(), httpURLConnection);
 
@@ -46,7 +47,7 @@ public abstract class Processor {
         try {
         	int responseCode = httpURLConnection.getResponseCode();
 
-			if (responseCode >= 200 && responseCode <= 299) {
+			if (is2XX(responseCode) || isRedirect(responseCode)) {
 				return handleResponseString(httpURLConnection, loadResponseString);
 			} else {
 				logHttpURLConnectionErrorStream(httpURLConnection);
@@ -63,7 +64,15 @@ public abstract class Processor {
         }
     }
 
-    private InputStream getInputStreamByConnection(HttpURLConnection httpURLConnection) throws IOException {
+	private boolean isRedirect(int responseCode) {
+		return responseCode >= 300 && responseCode <= 399 && !request.isFollowRedirects();
+	}
+
+	private boolean is2XX(int responseCode) {
+		return responseCode >= 200 && responseCode <= 299;
+	}
+
+	private InputStream getInputStreamByConnection(HttpURLConnection httpURLConnection) throws IOException {
         if ("gzip".equals(httpURLConnection.getContentEncoding())) {
             return new GZIPInputStream(httpURLConnection.getInputStream());
         } else {
@@ -120,7 +129,7 @@ public abstract class Processor {
 			wrapper.setResponseCode(responseCode);
 			wrapper.setResponseHeader(httpURLConnection.getHeaderFields());
 
-			if (responseCode >= 200 && responseCode <= 299) {
+			if (is2XX(responseCode) || isRedirect(responseCode)) {
 				wrapper.setResponseBody(handleResponseString(httpURLConnection, loadResponseString));
 				return wrapper;
 			} else {
