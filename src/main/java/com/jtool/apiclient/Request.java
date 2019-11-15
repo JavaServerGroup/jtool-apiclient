@@ -3,12 +3,16 @@ package com.jtool.apiclient;
 import com.jtool.apiclient.model.ParamMap;
 import com.jtool.apiclient.model.ResponseWrapper;
 import com.jtool.apiclient.processor.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
+@Accessors(chain = true)
 public class Request {
 
     private Map<String, String> header = new HashMap<>();
@@ -22,24 +26,7 @@ public class Request {
     private boolean isGzipResponse = false;
     private boolean isFollowRedirects = true;
 
-    protected Request() {
-    }
-
-    public String getParamsString() {
-        return paramsString;
-    }
-
-    public void setParamsString(String paramsString) {
-        this.paramsString = paramsString;
-    }
-
-    public boolean isWithClassName() {
-        return this.isWithClassName;
-    }
-
-    public Request isWithClassName(boolean isWithClassName) {
-        this.isWithClassName = isWithClassName;
-        return this;
+    Request() {
     }
 
     public Request header(Map<String, String> header) {
@@ -129,62 +116,6 @@ public class Request {
         return processor.getResponseHeader();
     }
 
-    public Map<String, String> getHeader() {
-        return header;
-    }
-
-    public void setHeader(Map<String, String> header) {
-        this.header = header;
-    }
-
-    public Object getParam() {
-        return param;
-    }
-
-    public void setParam(Map<String, Object> param) {
-        this.param = param;
-    }
-
-    public boolean isRest() {
-        return isRest;
-    }
-
-    public void setRest(boolean rest) {
-        isRest = rest;
-    }
-
-    public int getConnectionTimeout() {
-        return connectionTimeout;
-    }
-
-    public int getReadTimeout() {
-        return readTimeout;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public boolean isGzipResponse() {
-        return isGzipResponse;
-    }
-
-    public boolean isFollowRedirects() {
-        return isFollowRedirects;
-    }
-
-    public Request setFollowRedirects(boolean followRedirects) {
-        isFollowRedirects = followRedirects;
-        return this;
-    }
-
-    /**
-     * 增加wrapper返回
-     */
     public ResponseWrapper getResponseWrapper(String url) throws IOException {
         this.url = url;
         return new GetProcessor(this).process();

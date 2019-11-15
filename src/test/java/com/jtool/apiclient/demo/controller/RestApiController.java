@@ -28,7 +28,7 @@ public class RestApiController {
     @RequestMapping(value = "/restPost", method = RequestMethod.POST, produces = "application/json;charset=UTF-8", consumes = "application/json")
     public String restPost(@RequestBody(required = false) People people) {
         log.debug("REST POST:" + JSON.toJSONString(people));
-        if(people == null){
+        if (people == null) {
             people = new People();
         }
         return JSON.toJSONString(people);

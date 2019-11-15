@@ -47,21 +47,21 @@ public class ApiController {
         responsePeople.setAge(peopleRequest.getAge());
         responsePeople.setHeight(peopleRequest.getHeight());
 
-        if(peopleRequest.getImgs() != null) {
+        if (peopleRequest.getImgs() != null) {
             List<String> imagesStr = new ArrayList<>();
-            for(MultipartFile multipartFile : peopleRequest.getImgs()) {
+            for (MultipartFile multipartFile : peopleRequest.getImgs()) {
                 imagesStr.add(org.apache.commons.codec.binary.Base64.encodeBase64String(multipartFile.getBytes()));
             }
             responsePeople.setImgs(imagesStr);
         }
 
-        if(peopleRequest.getAvatar() != null) {
+        if (peopleRequest.getAvatar() != null) {
             responsePeople.setAvatar(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getAvatar().getBytes()));
         }
-        if(peopleRequest.getGallery() != null) {
+        if (peopleRequest.getGallery() != null) {
             responsePeople.setGallery(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getGallery().getBytes()));
         }
-        if(peopleRequest.getArticle() != null) {
+        if (peopleRequest.getArticle() != null) {
             responsePeople.setArticle(org.apache.commons.codec.binary.Base64.encodeBase64String(peopleRequest.getArticle().getBytes()));
         }
 
@@ -90,7 +90,7 @@ public class ApiController {
     @RequestMapping(value = "/forTestNeedLog", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public String forTestNeedLog(HttpServletRequest request) {
         String _logId = request.getParameter(LogHelper.JTOOL_LOG_ID);
-        if(null != _logId && !"".equals(_logId)){
+        if (null != _logId && !"".equals(_logId)) {
             return "true";
         } else {
             return "false";
@@ -125,7 +125,7 @@ public class ApiController {
         response.getOutputStream().write(zip(str));
     }
 
-    public byte[] zip(final String str) {
+    byte[] zip(final String str) {
         if ((str == null) || (str.length() == 0)) {
             throw new IllegalArgumentException("Cannot zip null or empty string");
         }
@@ -135,7 +135,7 @@ public class ApiController {
                 gzipOutputStream.write(str.getBytes(StandardCharsets.UTF_8));
             }
             return byteArrayOutputStream.toByteArray();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Failed to zip content", e);
         }
     }
