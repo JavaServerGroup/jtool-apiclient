@@ -7,11 +7,12 @@ import java.util.HashMap;
  */
 public class ParamMap extends HashMap<String, Object> {
 
-    public ParamMap add(String key, Object value){
-        this.put(key,value);
+    public ParamMap add(String key, Object value) {
+        this.put(key, value);
         return this;
     }
-    public static ParamMap newInstance(){
+
+    public static ParamMap newInstance() {
         return new ParamMap();
     }
 }

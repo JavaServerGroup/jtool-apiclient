@@ -1,4 +1,4 @@
-package com.jtool.apiclient;
+package com.jtool.apiclient.util;
 
 import com.jtool.apiclient.exception.Pojo2MapException;
 import org.slf4j.Logger;
@@ -18,22 +18,22 @@ import java.util.Map;
 
 import static com.jtool.apiclient.ApiClient.getCharsetName;
 
-public class Util {
+public class HttpUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(Util.class.getClass());
+    private static final Logger log = LoggerFactory.getLogger(HttpUtil.class.getClass());
 
-    private Util() {
+    private HttpUtil() {
     }
 
     public static String params2paramsStr(Object paramsObj) {
 
         Map<String, Object> params;
 
-        if(paramsObj == null) {
+        if (paramsObj == null) {
             return "";
         } else {
-            if(paramsObj instanceof Map) {
-                params = (Map<String, Object>)paramsObj;
+            if (paramsObj instanceof Map) {
+                params = (Map<String, Object>) paramsObj;
             } else {
                 params = obj2Map(paramsObj);
             }
@@ -45,7 +45,7 @@ public class Util {
 
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 if (entry.getValue() instanceof List) {
-                    paramsStrItemList.addAll(genParamsStrItemList(entry.getKey(), (List)entry.getValue()));
+                    paramsStrItemList.addAll(genParamsStrItemList(entry.getKey(), (List) entry.getValue()));
                 } else {
                     paramsStrItemList.add(genParamsStrItem(entry.getKey(), entry.getValue()));
                 }
@@ -62,7 +62,7 @@ public class Util {
 
         List<String> result = new ArrayList<>();
 
-        if(list == null || list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
             return result;
         }
 
@@ -74,11 +74,11 @@ public class Util {
 
     private static String joinParams(List<String> paramsList) {
         StringBuilder stringBuilder = new StringBuilder();
-        if(paramsList == null || paramsList.isEmpty()) {
+        if (paramsList == null || paramsList.isEmpty()) {
             return stringBuilder.toString();
         } else {
-            for(int i = 0; i < paramsList.size(); i++) {
-                if(i != 0) {
+            for (int i = 0; i < paramsList.size(); i++) {
+                if (i != 0) {
                     stringBuilder.append("&");
                     stringBuilder.append(paramsList.get(i));
                 } else {
@@ -90,7 +90,7 @@ public class Util {
     }
 
     private static String genParamsStrItem(String key, Object value) {
-        if(key == null || value == null) {
+        if (key == null || value == null) {
             return "";
         } else {
             StringBuilder paramsString = new StringBuilder();
@@ -130,15 +130,15 @@ public class Util {
         }
     }
 
-    public static void addHeaderToHttpURLConnection(Map<String, String> header, HttpURLConnection httpURLConnection) {
+    public static void addHeaderToHttpUrlConnection(Map<String, String> header, HttpURLConnection httpUrlConnection) {
         for (Map.Entry<String, String> entry : header.entrySet()) {
-            httpURLConnection.setRequestProperty(entry.getKey(), entry.getValue());
+            httpUrlConnection.setRequestProperty(entry.getKey(), entry.getValue());
         }
     }
 
     public static String readAndCloseStream(InputStream is) throws IOException {
 
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream(); BufferedInputStream bufferedInputStream = new BufferedInputStream(is)){
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream(); BufferedInputStream bufferedInputStream = new BufferedInputStream(is)) {
 
             byte[] buffer = new byte[1024];
             int len;
@@ -152,18 +152,18 @@ public class Util {
     }
 
     public static void writeAndCloseStream(OutputStream out, byte[] data) throws IOException {
-        try (OutputStream outputStream = new BufferedOutputStream(out)){
+        try (OutputStream outputStream = new BufferedOutputStream(out)) {
             outputStream.write(data);
             outputStream.flush();
         }
     }
 
-    public static void logHttpURLConnectionErrorStream(HttpURLConnection httpURLConnection) {
+    public static void logHttpUrlConnectionErrorStream(HttpURLConnection httpUrlConnection) {
         try {
-            if (httpURLConnection != null) {
-                String errorStream = readAndCloseStream(httpURLConnection.getErrorStream());
-                if(log.isErrorEnabled()) {
-                    log.error("访问发生异常，错误码是：" + httpURLConnection.getResponseCode() + "\t错误流信息为：" + errorStream);
+            if (httpUrlConnection != null) {
+                String errorStream = readAndCloseStream(httpUrlConnection.getErrorStream());
+                if (log.isErrorEnabled()) {
+                    log.error("访问发生异常，错误码是：{}\t错误流信息为：{}", httpUrlConnection.getResponseCode(), errorStream);
                 }
             }
         } catch (IOException ex) {
@@ -178,9 +178,9 @@ public class Util {
             return map;
         }
 
-        if(obj instanceof Map) {
-            for(Object key : ((Map)obj).keySet()) {
-                map.put(key.toString(), ((Map)obj).get(key));
+        if (obj instanceof Map) {
+            for (Object key : ((Map) obj).keySet()) {
+                map.put(key.toString(), ((Map) obj).get(key));
             }
             return map;
         }

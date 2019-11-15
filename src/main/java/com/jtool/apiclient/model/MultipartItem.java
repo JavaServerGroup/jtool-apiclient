@@ -8,10 +8,12 @@ import java.io.UnsupportedEncodingException;
  */
 public abstract class MultipartItem {
 
-    protected String key;
+    String key;
 
     public abstract String genContentDispositionStr();
+
     public abstract String genContentType();
+
     public abstract void genBody(OutputStream out) throws UnsupportedEncodingException;
 
     public String getKey() {

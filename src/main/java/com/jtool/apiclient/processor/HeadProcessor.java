@@ -2,15 +2,17 @@ package com.jtool.apiclient.processor;
 
 import com.alibaba.fastjson.JSON;
 import com.jtool.apiclient.Request;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
-import static com.jtool.apiclient.Util.*;
+import static com.jtool.apiclient.util.HttpUtil.makeHeaderLogString;
+import static com.jtool.apiclient.util.HttpUtil.params2paramsStr;
 
-public class HeadProcessor extends Processor {
+@Slf4j
+public class HeadProcessor extends AbstractProcessor {
 
     private Map<String, List<String>> responseHeader;
 
@@ -21,18 +23,18 @@ public class HeadProcessor extends Processor {
     @Override
     void processingParam() {
         appendParamStrToUrl(params2paramsStr(request.getParam()));
-        if(log.isDebugEnabled()) {
-            log.debug("发送请求: curl -X HEAD " + makeHeaderLogString(request.getHeader()) + " '" + request.getUrl() + "'");
+        if (log.isDebugEnabled()) {
+            log.debug("发送请求: curl -X HEAD {} '{}'", makeHeaderLogString(request.getHeader()), request.getUrl());
         }
     }
 
     @Override
-    HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException {
-        responseHeader = httpURLConnection.getHeaderFields();
-        if(log.isDebugEnabled()) {
+    HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) {
+        responseHeader = httpUrlConnection.getHeaderFields();
+        if (log.isDebugEnabled()) {
             log.debug("获得header: {}", JSON.toJSON(responseHeader));
         }
-        return httpURLConnection;
+        return httpUrlConnection;
     }
 
     private void appendParamStrToUrl(String paramsString) {
@@ -45,12 +47,8 @@ public class HeadProcessor extends Processor {
         }
     }
 
-
     public Map<String, List<String>> getResponseHeader() {
         return responseHeader;
     }
 
-    public void setResponseHeader(Map<String, List<String>> responseHeader) {
-        this.responseHeader = responseHeader;
-    }
 }

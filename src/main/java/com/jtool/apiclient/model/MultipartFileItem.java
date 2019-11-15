@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
-import static com.jtool.apiclient.processor.MultipartPostProcessor.CHARSET;
 import static com.jtool.apiclient.processor.MultipartPostProcessor.LINE_END;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Created by jialechan on 2017/2/22.
@@ -19,21 +19,17 @@ public class MultipartFileItem extends MultipartItem {
 
     @Override
     public String genContentDispositionStr() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Content-Disposition: form-data; name=\"").append(key).append("\"; filename=\"").append(file.getName()).append("\"").append(LINE_END);
-        return stringBuilder.toString();
+        return "Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + file.getName() + "\"" + LINE_END;
     }
 
     @Override
     public String genContentType() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Content-Type: ").append(getContentTypeByFilename(file.getName())).append("; charset=").append(CHARSET).append(LINE_END);
-        return stringBuilder.toString();
+        return "Content-Type: " + getContentTypeByFilename(file.getName()) + "; charset=" + UTF_8 + LINE_END;
     }
 
     @Override
     public void genBody(OutputStream outputStream) {
-        try (FileInputStream fileInputStream = new FileInputStream(file)){
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
             byte[] buffer = new byte[1024];
             int len;
             while ((len = fileInputStream.read(buffer)) != -1) {

@@ -3,21 +3,24 @@ package com.jtool.apiclient.processor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jtool.apiclient.Request;
-import com.jtool.apiclient.Util;
 import com.jtool.apiclient.exception.RestPostNotSupportFileException;
+import com.jtool.apiclient.util.HttpUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static com.jtool.apiclient.Util.makeHeaderLogString;
-import static com.jtool.apiclient.Util.writeAndCloseStream;
+import static com.jtool.apiclient.util.HttpUtil.makeHeaderLogString;
+import static com.jtool.apiclient.util.HttpUtil.writeAndCloseStream;
 
-public class RestPostProcessor extends Processor {
+@Slf4j
+public class RestPostProcessor extends AbstractProcessor {
 
-    private SerializerFeature[] features = new SerializerFeature[] {
+    private SerializerFeature[] features = new SerializerFeature[]{
             SerializerFeature.WriteClassName,
     };
 
@@ -28,16 +31,16 @@ public class RestPostProcessor extends Processor {
 
     @Override
     void processingParam() {
-        checkIsNotPostFile(Util.obj2Map(request.getParam()));
-        if(request.getParam() != null) {
-            if(request.isWithClassName()) {
+        checkIsNotPostFile(HttpUtil.obj2Map(request.getParam()));
+        if (request.getParam() != null) {
+            if (request.isWithClassName()) {
                 request.setParamsString(JSON.toJSONString(request.getParam(), features));
             } else {
                 request.setParamsString(JSON.toJSONString(request.getParam()));
             }
         }
-        if(log.isDebugEnabled()) {
-            if(request.getParamsString() == null) {
+        if (log.isDebugEnabled()) {
+            if (request.getParamsString() == null) {
                 log.debug("发送请求: curl '{}' {} -X POST",
                         request.getUrl(),
                         makeHeaderLogString(request.getHeader(), request.isRest()));
@@ -51,18 +54,18 @@ public class RestPostProcessor extends Processor {
     }
 
     @Override
-    HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException {
-        httpURLConnection.setDoOutput(true);
-        httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+    HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException {
+        httpUrlConnection.setDoOutput(true);
+        httpUrlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         if (request.getParamsString() != null) {
-            byte[] data = request.getParamsString().getBytes("UTF-8");
-            httpURLConnection.setFixedLengthStreamingMode(data.length);
+            byte[] data = request.getParamsString().getBytes(StandardCharsets.UTF_8);
+            httpUrlConnection.setFixedLengthStreamingMode(data.length);
 
-            writeAndCloseStream(httpURLConnection.getOutputStream(), data);
+            writeAndCloseStream(httpUrlConnection.getOutputStream(), data);
         } else {
-            httpURLConnection.setFixedLengthStreamingMode(0);
+            httpUrlConnection.setFixedLengthStreamingMode(0);
         }
-        return httpURLConnection;
+        return httpUrlConnection;
     }
 
     private void checkIsNotPostFile(Map<String, Object> params) {
@@ -79,7 +82,7 @@ public class RestPostProcessor extends Processor {
         }
         if (entry.getValue() instanceof List) {
 
-            for(Object obj : (List)entry.getValue()) {
+            for (Object obj : (List) entry.getValue()) {
                 if (obj instanceof File) {
                     throw new RestPostNotSupportFileException();
                 }

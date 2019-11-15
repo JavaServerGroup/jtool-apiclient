@@ -124,9 +124,9 @@ public class Request {
 
     public Map<String, List<String>> head(String url) throws IOException {
         this.url = url;
-        Processor processor = new HeadProcessor(this);
+        HeadProcessor processor = new HeadProcessor(this);
         processor.process(false);
-        return ((HeadProcessor)processor).getResponseHeader();
+        return processor.getResponseHeader();
     }
 
     public Map<String, String> getHeader() {
@@ -185,26 +185,26 @@ public class Request {
     /**
      * 增加wrapper返回
      */
-	public ResponseWrapper getResponseWrapper(String url) throws IOException {
-		this.url = url;
-		return new GetProcessor(this).process();
-	}
+    public ResponseWrapper getResponseWrapper(String url) throws IOException {
+        this.url = url;
+        return new GetProcessor(this).process();
+    }
 
     public ResponseWrapper postResponseWrapper(String url) throws IOException {
         this.url = url;
-        Processor processor = new PostProcessor(this);
+        AbstractProcessor processor = new PostProcessor(this);
         return processor.process();
     }
 
     public ResponseWrapper restPostResponseWrapper(String url) throws IOException {
         this.url = url;
-        Processor processor = new RestPostProcessor(this);
+        AbstractProcessor processor = new RestPostProcessor(this);
         return processor.process();
     }
 
     public ResponseWrapper filePostResponseWrapper(String url) throws IOException {
         this.url = url;
-        Processor processor = new MultipartPostProcessor(this);
+        AbstractProcessor processor = new MultipartPostProcessor(this);
         return processor.process();
     }
 

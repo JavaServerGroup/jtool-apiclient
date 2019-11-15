@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import static com.jtool.apiclient.processor.MultipartPostProcessor.CHARSET;
 import static com.jtool.apiclient.processor.MultipartPostProcessor.LINE_END;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Created by jialechan on 2017/2/22.
@@ -26,13 +26,13 @@ public class MultipartTextItem extends MultipartItem {
 
     @Override
     public String genContentType() {
-        return "Content-Type: text/plain; charset=" + CHARSET + LINE_END;
+        return "Content-Type: text/plain; charset=" + UTF_8 + LINE_END;
     }
 
     @Override
     public void genBody(OutputStream out) throws UnsupportedEncodingException {
         try {
-            out.write(value.getBytes(CHARSET));
+            out.write(value.getBytes(UTF_8));
         } catch (IOException e) {
             log.error("写入multipart的body遇到错误", e);
         }

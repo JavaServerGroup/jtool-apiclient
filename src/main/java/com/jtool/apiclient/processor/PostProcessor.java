@@ -1,15 +1,15 @@
 package com.jtool.apiclient.processor;
 
 import com.jtool.apiclient.Request;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import static com.jtool.apiclient.Util.makeHeaderLogString;
-import static com.jtool.apiclient.Util.params2paramsStr;
-import static com.jtool.apiclient.Util.writeAndCloseStream;
+import static com.jtool.apiclient.util.HttpUtil.*;
 
-public class PostProcessor extends Processor {
+@Slf4j
+public class PostProcessor extends AbstractProcessor {
 
     public PostProcessor(Request request) {
         this.request = request;
@@ -18,25 +18,24 @@ public class PostProcessor extends Processor {
     @Override
     void processingParam() {
         request.setParamsString(params2paramsStr(request.getParam()));
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("发送请求: curl '{}' {} -X POST -d '{}'", request.getUrl(), makeHeaderLogString(request.getHeader(), request.isRest()), request.getParamsString());
         }
-
     }
 
     @Override
-    HttpURLConnection doProcess(HttpURLConnection httpURLConnection) throws IOException {
-        httpURLConnection.setDoOutput(true);
+    HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException {
+        httpUrlConnection.setDoOutput(true);
         if (!"".equals(request.getParamsString())) {
-            httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            httpUrlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
             byte[] data = request.getParamsString().getBytes("UTF-8");
-            httpURLConnection.setFixedLengthStreamingMode(data.length);
+            httpUrlConnection.setFixedLengthStreamingMode(data.length);
 
-            writeAndCloseStream(httpURLConnection.getOutputStream(), data);
+            writeAndCloseStream(httpUrlConnection.getOutputStream(), data);
         } else {
-            httpURLConnection.setFixedLengthStreamingMode(0);
+            httpUrlConnection.setFixedLengthStreamingMode(0);
         }
-        return httpURLConnection;
+        return httpUrlConnection;
     }
 
 }

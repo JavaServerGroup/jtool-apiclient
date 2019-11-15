@@ -7,38 +7,38 @@ import java.util.Map;
 
 public class ResponseWrapper {
 
-	private int responseCode;
+    private int responseCode;
 
-	private String responseBody;
+    private String responseBody;
 
-	private Map<String, List<String>> responseHeader;
+    private Map<String, List<String>> responseHeader;
 
-	public int getResponseCode() {
-		return responseCode;
-	}
+    public int getResponseCode() {
+        return responseCode;
+    }
 
-	public void setResponseCode(int responseCode) {
-		this.responseCode = responseCode;
-	}
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
 
-	public String getResponseBody() {
-		return responseBody;
-	}
+    public String getResponseBody() {
+        return responseBody;
+    }
 
-	public <T> T getResponseBody(Class<T> clazz) {
-		return JSON.parseObject(responseBody, clazz);
-	}
+    public <T> T getResponseBody(Class<T> clazz) {
+        return JSON.parseObject(responseBody, clazz);
+    }
 
-	public void setResponseBody(String responseBody) {
-		this.responseBody = responseBody;
-	}
+    public void setResponseBody(String responseBody) {
+        this.responseBody = responseBody;
+    }
 
-	public Map<String, List<String>> getResponseHeader() {
-		return responseHeader;
-	}
+    public Map<String, List<String>> getResponseHeader() {
+        return responseHeader;
+    }
 
-	public void setResponseHeader(Map<String, List<String>> responseHeader) {
-		this.responseHeader = responseHeader;
-	}
+    public void setResponseHeader(Map<String, List<String>> responseHeader) {
+        this.responseHeader = responseHeader;
+    }
 
 }
