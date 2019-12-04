@@ -18,6 +18,17 @@ public abstract class AbstractProcessor {
 
     protected Request request;
 
+    public ResponseWrapper process(boolean loadResponseString) throws IOException {
+        processingParam();
+        final HttpURLConnection httpUrlConnection = commonPreProcess();
+        doProcess(httpUrlConnection);
+        return loadResponseWrapper(httpUrlConnection, loadResponseString);
+    }
+
+    abstract void processingParam();
+
+    abstract HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException;
+
     private HttpURLConnection commonPreProcess() throws IOException {
         final URL url = new URL(request.getUrl());
 
@@ -35,10 +46,6 @@ public abstract class AbstractProcessor {
 
         return httpUrlConnection;
     }
-
-    abstract void processingParam();
-
-    abstract HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException;
 
     private String loadResponseString(HttpURLConnection httpUrlConnection, boolean loadResponseString) throws IOException {
 
@@ -79,13 +86,6 @@ public abstract class AbstractProcessor {
 
     public ResponseWrapper process() throws IOException {
         return process(true);
-    }
-
-    public ResponseWrapper process(boolean loadResponseString) throws IOException {
-        processingParam();
-        final HttpURLConnection httpUrlConnection = commonPreProcess();
-        doProcess(httpUrlConnection);
-        return loadResponseWrapper(httpUrlConnection, loadResponseString);
     }
 
     /**
