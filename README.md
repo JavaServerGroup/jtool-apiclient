@@ -21,7 +21,7 @@
 <dependency>
     <groupId>com.jtool</groupId>
     <artifactId>jtool-apiclient</artifactId>
-    <version>0.0.13</version>
+    <version>0.0.18</version>
 </dependency>
 ```
 2.添加import
