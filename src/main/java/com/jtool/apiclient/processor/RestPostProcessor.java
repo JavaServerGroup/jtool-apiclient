@@ -56,7 +56,9 @@ public class RestPostProcessor extends AbstractProcessor {
     @Override
     HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException {
         httpUrlConnection.setDoOutput(true);
-        httpUrlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        if(httpUrlConnection.getRequestProperty("Content-Type") == null) {
+            httpUrlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        }
         if (request.getParamsString() != null) {
             byte[] data = request.getParamsString().getBytes(StandardCharsets.UTF_8);
             httpUrlConnection.setFixedLengthStreamingMode(data.length);
