@@ -1,6 +1,6 @@
 package com.jtool.apiclient;
 
-public class ApiClient {
+public class Apilient {
 
     private static int connectionTimeout = 30000;
     private static int readTimeout = 30000;
