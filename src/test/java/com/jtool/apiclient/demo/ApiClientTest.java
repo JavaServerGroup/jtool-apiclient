@@ -37,7 +37,7 @@ public class ApiClientTest {
         Assert.assertEquals("{}", Api().get(host + "/sentGet"));
 
         ResponsePeople responsePeople = Api().get(host + "/sentGet?name=" + URLEncoder.encode("中文名", "UTF-8"), ResponsePeople.class);
-        Assert.assertEquals("中文", responsePeople.getName());
+        Assert.assertEquals("中文名", responsePeople.getName());
         Assert.assertNull(responsePeople.getAge());
         Assert.assertNull(responsePeople.getGallery());
         Assert.assertNull(responsePeople.getHeight());
