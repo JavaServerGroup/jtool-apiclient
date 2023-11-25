@@ -1,7 +1,6 @@
 package com.jtool.apiclient.processor;
 
-import com.jtool.apiclient.Request;
-import com.jtool.apiclient.exception.StatusCodeNot200Exception;
+import com.jtool.apiclient.model.Request;
 import com.jtool.apiclient.model.ResponseWrapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,65 +15,39 @@ import static com.jtool.apiclient.util.HttpUtil.*;
 @Slf4j
 public abstract class AbstractProcessor {
 
+    private HttpURLConnection httpUrlConnection;
+
     protected Request request;
 
-    public ResponseWrapper process(boolean loadResponseString) throws IOException {
+    /**
+     * 执行http请求
+     */
+    public ResponseWrapper process() throws IOException {
         processingParam();
-        final HttpURLConnection httpUrlConnection = commonPreProcess();
+        commonPreProcess();
         doProcess(httpUrlConnection);
-        return loadResponseWrapper(httpUrlConnection, loadResponseString);
+        return loadResponseWrapper(httpUrlConnection);
     }
 
+    // 处理请求参数
     abstract void processingParam();
 
-    abstract HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException;
-
-    private HttpURLConnection commonPreProcess() throws IOException {
+    // 通用的请求预处理
+    private void commonPreProcess() throws IOException {
         final URL url = new URL(request.getUrl());
 
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
+        httpUrlConnection = (HttpURLConnection) url.openConnection();
         httpUrlConnection.setRequestProperty("Charset", "UTF-8");
         httpUrlConnection.setConnectTimeout(request.getConnectionTimeout());
         httpUrlConnection.setReadTimeout(request.getReadTimeout());
         httpUrlConnection.setInstanceFollowRedirects(request.isFollowRedirects());
+        httpUrlConnection.setRequestProperty("Accept-Encoding", "gzip");
 
         addHeaderToHttpUrlConnection(request.getHeader(), httpUrlConnection);
-
-        if (request.isGzipResponse()) {
-            httpUrlConnection.setRequestProperty("Accept-Encoding", "gzip");
-        }
-
-        return httpUrlConnection;
     }
 
-    private String loadResponseString(HttpURLConnection httpUrlConnection, boolean loadResponseString) throws IOException {
-
-        try {
-            int responseCode = httpUrlConnection.getResponseCode();
-
-            if (is2XX(responseCode) || isRedirect(responseCode)) {
-                return handleResponseString(httpUrlConnection, loadResponseString);
-            } else {
-                logHttpUrlConnectionErrorStream(httpUrlConnection);
-                throw new StatusCodeNot200Exception(request.getUrl(), request.getParam(), responseCode);
-            }
-
-        } catch (IOException e) {
-            logHttpUrlConnectionErrorStream(httpUrlConnection);
-            log.error("请求返回时发生IOException", e);
-            throw e;
-        } finally {
-            httpUrlConnection.disconnect();
-        }
-    }
-
-    private boolean isRedirect(int responseCode) {
-        return responseCode >= 300 && responseCode <= 399 && !request.isFollowRedirects();
-    }
-
-    private boolean is2XX(int responseCode) {
-        return responseCode >= 200 && responseCode <= 299;
-    }
+    // 执行实际的请求
+    abstract HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) throws IOException;
 
     private InputStream getInputStreamByConnection(HttpURLConnection httpURLConnection) throws IOException {
         if ("gzip".equals(httpURLConnection.getContentEncoding())) {
@@ -84,29 +57,19 @@ public abstract class AbstractProcessor {
         }
     }
 
-    public ResponseWrapper process() throws IOException {
-        return process(true);
-    }
-
     /**
      * 处理responseBody输入流
      *
      * @param httpUrlConnection
-     * @param loadResponseString
      * @return
      * @throws IOException
      */
-    private String handleResponseString(HttpURLConnection httpUrlConnection, boolean loadResponseString)
+    private String handleResponseString(HttpURLConnection httpUrlConnection)
             throws IOException {
         try (InputStream is = getInputStreamByConnection(httpUrlConnection)) {
-            if (loadResponseString) {
-
-                final String result = readAndCloseStream(is);
-                log.debug("返回: {}", result);
-                return result;
-            } else {
-                return "";
-            }
+            final String result = readAndCloseStream(is);
+            log.debug("返回: {}", result);
+            return result;
         }
     }
 
@@ -114,11 +77,10 @@ public abstract class AbstractProcessor {
      * 处理response获取wrapper
      *
      * @param httpUrlConnection
-     * @param loadResponseString
      * @return
      * @throws IOException
      */
-    private ResponseWrapper loadResponseWrapper(HttpURLConnection httpUrlConnection, boolean loadResponseString)
+    private ResponseWrapper loadResponseWrapper(HttpURLConnection httpUrlConnection)
             throws IOException {
         ResponseWrapper wrapper = new ResponseWrapper();
         try {
@@ -126,14 +88,8 @@ public abstract class AbstractProcessor {
             wrapper.setResponseCode(responseCode);
             wrapper.setResponseHeader(httpUrlConnection.getHeaderFields());
 
-            if (is2XX(responseCode) || isRedirect(responseCode)) {
-                wrapper.setResponseBody(handleResponseString(httpUrlConnection, loadResponseString));
-                return wrapper;
-            } else {
-                logHttpUrlConnectionErrorStream(httpUrlConnection);
-                throw new StatusCodeNot200Exception(request.getUrl(), request.getParam(), responseCode);
-            }
-
+            wrapper.setResponseBody(handleResponseString(httpUrlConnection));
+            return wrapper;
         } catch (IOException e) {
             logHttpUrlConnectionErrorStream(httpUrlConnection);
             log.error("请求返回时发生IOException", e);

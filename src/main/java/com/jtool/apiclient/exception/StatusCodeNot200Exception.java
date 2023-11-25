@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ToString
 @Getter
-public class StatusCodeNot200Exception extends RuntimeException {
+public class StatusCodeNot200Exception extends Exception {
 
     private final String url;
     private final int statusCode;

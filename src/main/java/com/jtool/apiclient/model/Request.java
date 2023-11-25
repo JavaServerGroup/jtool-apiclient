@@ -1,7 +1,6 @@
-package com.jtool.apiclient;
+package com.jtool.apiclient.model;
 
-import com.jtool.apiclient.model.ParamMap;
-import com.jtool.apiclient.model.ResponseWrapper;
+import com.jtool.apiclient.ApiClient;
 import com.jtool.apiclient.processor.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,18 +14,28 @@ import java.util.Map;
 @Accessors(chain = true)
 public class Request {
 
+    // http请求的header
     private Map<String, String> header = new HashMap<>();
+
+    // http请求参数
     private Object param;
+
+    // http请求的地址
     private String url;
-    private boolean isRest;
-    private int connectionTimeout = ApiClient.getConnectionTimeout();
-    private int readTimeout = ApiClient.getReadTimeout();
+
+    // 默认使用全局超时时间配置
+    private int connectionTimeout = ApiClient.getDefaultConnectionTimeout();
+
+    // 默认使用全局超时时间配置
+    private int readTimeout = ApiClient.getDefaultReadTimeout();
+
+    // url上的请求字符串
     private String paramsString;
-    private boolean isWithClassName;
-    private boolean isGzipResponse = false;
+
+    // 是否跟随跳转
     private boolean isFollowRedirects = true;
 
-    Request() {
+    public Request() {
     }
 
     public Request header(Map<String, String> header) {
@@ -61,11 +70,6 @@ public class Request {
             throw new IllegalArgumentException("param方法应该只调用一次");
         }
         this.param = param;
-        return this;
-    }
-
-    public Request gzipResponse() {
-        this.isGzipResponse = true;
         return this;
     }
 
@@ -112,7 +116,7 @@ public class Request {
     public Map<String, List<String>> head(String url) throws IOException {
         this.url = url;
         HeadProcessor processor = new HeadProcessor(this);
-        processor.process(false);
+        processor.process();
         return processor.getResponseHeader();
     }
 

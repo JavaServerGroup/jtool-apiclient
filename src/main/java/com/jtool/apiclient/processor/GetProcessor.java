@@ -1,6 +1,6 @@
 package com.jtool.apiclient.processor;
 
-import com.jtool.apiclient.Request;
+import com.jtool.apiclient.model.Request;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.HttpURLConnection;
@@ -18,13 +18,13 @@ public class GetProcessor extends AbstractProcessor {
     @Override
     void processingParam() {
         appendParamStrToUrl(params2paramsStr(request.getParam()));
-        if (log.isDebugEnabled()) {
-            log.debug("发送请求: curl {} '{}'", makeHeaderLogString(request.getHeader()),  request.getUrl());
-        }
     }
 
     @Override
     HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) {
+        if (log.isDebugEnabled()) {
+            log.debug("发送请求: curl {} '{}'", makeHeaderLogString(request.getHeader()),  request.getUrl());
+        }
         return httpUrlConnection;
     }
 

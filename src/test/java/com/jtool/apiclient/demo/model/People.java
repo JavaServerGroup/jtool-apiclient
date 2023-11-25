@@ -1,10 +1,12 @@
 package com.jtool.apiclient.demo.model;
 
+import lombok.Data;
+
 import java.io.File;
 import java.util.List;
 
+@Data
 public class People {
-
     private String name;
     private Integer age;
     private Double height;
@@ -12,84 +14,5 @@ public class People {
     private File avatar;
     private File gallery;
     private File article;
-
     private List<String> tels;
-
-    public List<File> getImgs() {
-        return imgs;
-    }
-
-    public void setImgs(List<File> imgs) {
-        this.imgs = imgs;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public Double getHeight() {
-        return height;
-    }
-
-    public void setHeight(Double height) {
-        this.height = height;
-    }
-
-    public File getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(File avatar) {
-        this.avatar = avatar;
-    }
-
-    public File getGallery() {
-        return gallery;
-    }
-
-    public void setGallery(File gallery) {
-        this.gallery = gallery;
-    }
-
-    public File getArticle() {
-        return article;
-    }
-
-    public void setArticle(File article) {
-        this.article = article;
-    }
-
-    public List<String> getTels() {
-        return tels;
-    }
-
-    public void setTels(List<String> tels) {
-        this.tels = tels;
-    }
-
-    @Override
-    public String toString() {
-        return "People{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                ", height=" + height +
-                ", imgs=" + imgs +
-                ", avatar=" + avatar +
-                ", gallery=" + gallery +
-                ", article=" + article +
-                ", tels=" + tels +
-                '}';
-    }
 }

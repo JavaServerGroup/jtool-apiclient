@@ -1,8 +1,8 @@
 package com.jtool.apiclient.util;
 
+import com.jtool.apiclient.ApiClient;
 import com.jtool.apiclient.exception.Pojo2MapException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -16,16 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jtool.apiclient.ApiClient.getCharsetName;
-
+@Slf4j
 public class HttpUtil {
-
-    private static final Logger log = LoggerFactory.getLogger(HttpUtil.class.getClass());
 
     private HttpUtil() {
     }
 
-    public static String params2paramsStr(Object paramsObj) {
+    public static String params2paramsStr(Object paramsObj) throws Pojo2MapException {
 
         Map<String, Object> params;
 
@@ -39,7 +36,7 @@ public class HttpUtil {
             }
         }
 
-        if (params.size() > 0) {
+        if (!params.isEmpty()) {
 
             List<String> paramsStrItemList = new ArrayList<>();
 
@@ -74,9 +71,7 @@ public class HttpUtil {
 
     private static String joinParams(List<String> paramsList) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (paramsList == null || paramsList.isEmpty()) {
-            return stringBuilder.toString();
-        } else {
+        if (paramsList != null && !paramsList.isEmpty()) {
             for (int i = 0; i < paramsList.size(); i++) {
                 if (i != 0) {
                     stringBuilder.append("&");
@@ -85,31 +80,27 @@ public class HttpUtil {
                     stringBuilder.append(paramsList.get(i));
                 }
             }
-            return stringBuilder.toString();
         }
+        return stringBuilder.toString();
     }
 
     private static String genParamsStrItem(String key, Object value) {
         if (key == null || value == null) {
             return "";
-        } else {
-            StringBuilder paramsString = new StringBuilder();
-            try {
-                paramsString.append(URLEncoder.encode(key, getCharsetName()));
-                paramsString.append("=");
-                paramsString.append(URLEncoder.encode(value.toString(), getCharsetName()));
-            } catch (UnsupportedEncodingException e) {
-                log.error("不支持字符编码", e);
-            }
-            return paramsString.toString();
         }
+
+        StringBuilder paramsString = new StringBuilder();
+        try {
+            paramsString.append(URLEncoder.encode(key, ApiClient.getCharsetName()));
+            paramsString.append("=");
+            paramsString.append(URLEncoder.encode(value.toString(), ApiClient.getCharsetName()));
+        } catch (UnsupportedEncodingException e) {
+            log.error("不支持字符编码", e);
+        }
+        return paramsString.toString();
     }
 
     public static String makeHeaderLogString(Map<String, String> header) {
-        return makeHeaderLogString(header, false);
-    }
-
-    public static String makeHeaderLogString(Map<String, String> header, boolean isRest) {
         if (header == null) {
             return "";
         } else {
@@ -120,10 +111,6 @@ public class HttpUtil {
                 headerStr.append(": ");
                 headerStr.append(entry.getValue());
                 headerStr.append("' ");
-            }
-
-            if (isRest) {
-                headerStr.append(" -H 'Content-Type:application/json' ");
             }
 
             return headerStr.toString();

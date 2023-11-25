@@ -1,7 +1,7 @@
 package com.jtool.apiclient.processor;
 
-import com.alibaba.fastjson.JSON;
-import com.jtool.apiclient.Request;
+import com.alibaba.fastjson2.JSON;
+import com.jtool.apiclient.model.Request;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.HttpURLConnection;
@@ -23,14 +23,14 @@ public class HeadProcessor extends AbstractProcessor {
     @Override
     void processingParam() {
         appendParamStrToUrl(params2paramsStr(request.getParam()));
-        if (log.isDebugEnabled()) {
-            log.debug("发送请求: curl -X HEAD {} '{}'", makeHeaderLogString(request.getHeader()), request.getUrl());
-        }
     }
 
     @Override
     HttpURLConnection doProcess(HttpURLConnection httpUrlConnection) {
         responseHeader = httpUrlConnection.getHeaderFields();
+        if (log.isDebugEnabled()) {
+            log.debug("发送请求: curl -X HEAD {} '{}'", makeHeaderLogString(request.getHeader()), request.getUrl());
+        }
         if (log.isDebugEnabled()) {
             log.debug("获得header: {}", JSON.toJSON(responseHeader));
         }

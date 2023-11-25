@@ -1,6 +1,6 @@
 package com.jtool.apiclient.processor;
 
-import com.jtool.apiclient.Request;
+import com.jtool.apiclient.model.Request;
 import com.jtool.apiclient.model.MultipartFileItem;
 import com.jtool.apiclient.model.MultipartItem;
 import com.jtool.apiclient.model.MultipartTextItem;
